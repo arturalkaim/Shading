@@ -1,0 +1,24 @@
+
+// Tesselation Eval shader
+const GLchar* tesselationEvalShaderSrc = GLSL(
+
+    layout (triangles, equal_spacing, cw) in;
+    //layout (vertices = 3) out;
+
+    //out vec4 color;
+
+    void main()
+    {
+    float u = gl_TessCoord.x;
+    float omu = 1 - u; // one minus "u"
+    float v = gl_TessCoord.y;
+    float omv = 1 - v; // one minus "v"
+       //color = vec4(gl_TessCoord,1);
+       gl_Position =
+         omu * omv * gl_in[0].gl_Position +
+         u * omv * gl_in[1].gl_Position +
+         u * v * gl_in[2].gl_Position +
+         omu * v * gl_in[3].gl_Position;
+    }
+
+);
