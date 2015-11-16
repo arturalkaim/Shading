@@ -17,7 +17,7 @@
 
 const float PI = 3.1415926;
 
-#define VALUES_PER_POINT 18
+#define VALUES_PER_POINT 19
 int n_points = 0;
 int vecSize = 10;
 GLfloat* points = (float *)calloc(sizeof(float), VALUES_PER_POINT * 10);
@@ -76,7 +76,7 @@ glm::mat4 cleanColor(glm::mat4 mat) {
 }
 
 int buildPoint(int n,
-	glm::mat4 mat, float type, float n_sides, glm::vec3 color) {
+	glm::mat4 mat, float type, float n_sides, float scale, glm::vec3 color) {
 
 	n_points++;
 	//printMatrix(mat);
@@ -100,6 +100,7 @@ int buildPoint(int n,
 
 	points[n*VALUES_PER_POINT + 16] = type;
 	points[n*VALUES_PER_POINT + 17] = n_sides;
+	points[n*VALUES_PER_POINT + 18] = scale;
 
 
 	//printMatrixV(n);
@@ -210,53 +211,53 @@ glm::mat4 buildTMatrixFromPoints(float pos_x, float pos_y, float pos_z, float po
 extern "C" __declspec(dllexport) int building(float pos_x, float pos_y, float pos_z, float w, float l, float h, int divs, float r, float g, float b) {
 	//printf("Build Box\n");
 	return buildPoint(n_points, glm::scale(glm::translate(glm::mat4(), glm::vec3(pos_x, pos_y, pos_z)), glm::vec3(w, l, h)),
-		8, divs, glm::vec3(r, g, b));
+		8, divs, w, glm::vec3(r, g, b));
 }
 extern "C" __declspec(dllexport) int buildingv(float pos_x, float pos_y, float pos_z, float w, float l, float h, int divs, glm::vec3 color) {
 	//printf("Build Box\n");
 	return buildPoint(n_points, glm::scale(glm::translate(glm::mat4(), glm::vec3(pos_x, pos_y, pos_z)), glm::vec3(w, l, h)),
-		8, divs, color);
+		8, divs, w, color);
 }
 
 extern "C" __declspec(dllexport) int tree(float pos_x, float pos_y, float pos_z, float w, float l, float h, int divs, glm::vec3 color) {
 	//printf("Build Box\n");
 	return buildPoint(n_points, glm::scale(glm::translate(glm::mat4(), glm::vec3(pos_x, pos_y, pos_z)), glm::vec3(w, l, h)),
-		9, divs, color);
+		9, divs, w, color);
 }
 
 extern "C" __declspec(dllexport) int boxv(float pos_x, float pos_y, float pos_z, float w, float l, float h, glm::vec3 color) {
 	//printf("Build Box\n");
 	return buildPoint(n_points, glm::scale(glm::translate(glm::mat4(), glm::vec3(pos_x, pos_y, pos_z)), glm::vec3(w, l, h)),
-		1, 4, color);
+		1, 4, w, color);
 }
 
 extern "C" __declspec(dllexport) int box(float pos_x, float pos_y, float pos_z, float w, float l, float h, float red, float g, float b, float angle, float vx, float vy, float vz) {
 	//printf("Build Box\n");
 	return buildPoint(n_points, glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(pos_x, pos_y, pos_z)), angle, glm::vec3(vx, vy, vz)), glm::vec3(w, l, h)),
-		1, 4, glm::vec3(red, g, b));
+		1, 4, w, glm::vec3(red, g, b));
 }
 
 extern "C" __declspec(dllexport) int prism(float pos_x, float pos_y, float pos_z, float l, float w, float h, float sides, float red, float g, float b, float angle, float vx, float vy, float vz) {
 	//printf("Build Cylinder\n");
 	return buildPoint(n_points, glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(pos_x, pos_y, pos_z)), angle, glm::vec3(vx, vy, vz)), glm::vec3(l, w, h)),
-		3, sides, glm::vec3(red, g, b));
+		3, sides, w, glm::vec3(red, g, b));
 }
 
 extern "C" __declspec(dllexport) int prismpts(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float l, float w, float h, float sides, float red, float g, float b) {
 	//printf("Build Cylinder\n");
 	return buildPoint(n_points, glm::scale(buildTMatrixFromPoints(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2), glm::vec3(l, w, h)),
-		3, sides, glm::vec3(red, g, b));
+		3, sides, w, glm::vec3(red, g, b));
 }
 
 extern "C" __declspec(dllexport) int cylinder(float pos_x, float pos_y, float pos_z, float r, float h, float red, float g, float b, float angle, float vx, float vy, float vz) {
 	//printf("Build Cylinder\n");
 	return buildPoint(n_points, glm::scale(glm::rotate(glm::translate(glm::mat4(1.0f), glm::vec3(pos_x, pos_y, pos_z)), angle, glm::vec3(vx, vy, vz)), glm::vec3(r, r, h)),
-		3, 20, glm::vec3(red, g, b));
+		3, 20, r, glm::vec3(red, g, b));
 }
 extern "C" __declspec(dllexport) int cylinderv(float pos_x, float pos_y, float pos_z, float r, float h, glm::vec3 color) {
 	//printf("Build Cylinder\n");
 	return buildPoint(n_points, glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(pos_x, pos_y, pos_z)), glm::vec3(r, r, h)),
-		3, 20, color);
+		3, 20, r, color);
 }
 extern "C" __declspec(dllexport) int pyramid(float pos_x, float pos_y, float pos_z, float w, float l, float h, float sides, glm::vec3 color) {
 	return buildPoint(n_points, glm::scale(
@@ -264,7 +265,7 @@ extern "C" __declspec(dllexport) int pyramid(float pos_x, float pos_y, float pos
 			glm::mat4(),
 			glm::vec3(pos_x, pos_y, pos_z)),
 		glm::vec3(w, l, h)),
-		4, sides, color);
+		4, sides, w, color);
 }
 extern "C" __declspec(dllexport) int spherev(float pos_x, float pos_y, float pos_z, float r, glm::vec3 color) {
 	buildPoint(n_points, glm::scale(
@@ -272,19 +273,19 @@ extern "C" __declspec(dllexport) int spherev(float pos_x, float pos_y, float pos
 			glm::mat4(),
 			glm::vec3(pos_x, pos_y, pos_z)),
 		glm::vec3(r, r, r)),
-		5, 23, color);
+		5, 20, r, color);
 	buildPoint(n_points, glm::scale(
 		glm::translate(
 			glm::mat4(),
 			glm::vec3(pos_x, pos_y, pos_z)),
 		glm::vec3(r, r, r)),
-		6, 23, color);
+		6, 20, r, color);
 	return buildPoint(n_points, glm::scale(
 		glm::translate(
 			glm::mat4(),
 			glm::vec3(pos_x, pos_y, pos_z)),
 		glm::vec3(r, r, r)),
-		7, 23, color);
+		7, 20, r, color);
 	/*return buildPoint(n_points, glm::scale(
 	glm::translate(
 	glm::mat4(),
@@ -298,19 +299,19 @@ extern "C" __declspec(dllexport) int sphere(float pos_x, float pos_y, float pos_
 			glm::mat4(),
 			glm::vec3(pos_x, pos_y, pos_z)),
 		glm::vec3(r, r, r)),
-		5, 23, glm::vec3(red, g, b));
+		5, 23, r, glm::vec3(red, g, b));
 	buildPoint(n_points, glm::scale(
 		glm::translate(
 			glm::mat4(),
 			glm::vec3(pos_x, pos_y, pos_z)),
 		glm::vec3(r, r, r)),
-		6, 23, glm::vec3(red, g, b));
+		6, 23, r, glm::vec3(red, g, b));
 	return buildPoint(n_points, glm::scale(
 		glm::translate(
 			glm::mat4(),
 			glm::vec3(pos_x, pos_y, pos_z)),
 		glm::vec3(r, r, r)),
-		7, 23, glm::vec3(red, g, b));
+		7, 23, r, glm::vec3(red, g, b));
 	/*return buildPoint(n_points, glm::scale(
 	glm::translate(
 	glm::mat4(),
@@ -758,6 +759,11 @@ extern "C" __declspec(dllexport) int init(int n) {
 	posAttrib = glGetAttribLocation(shaderProgram, "sides");
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 1, GL_FLOAT, GL_FALSE, VALUES_PER_POINT * sizeof(GLfloat), (void*)(17 * sizeof(GLfloat)));
+
+	// Specify layout of point data
+	posAttrib = glGetAttribLocation(shaderProgram, "scale");
+	glEnableVertexAttribArray(posAttrib);
+	glVertexAttribPointer(posAttrib, 1, GL_FLOAT, GL_FALSE, VALUES_PER_POINT * sizeof(GLfloat), (void*)(18 * sizeof(GLfloat)));
 
 	// Create transformations
 	model = glm::mat4(1.0f);

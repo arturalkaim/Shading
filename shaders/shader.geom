@@ -11,8 +11,7 @@ const GLchar* geometryShaderSrc = GLSL(
 	uniform mat4 MVP;
 
     in int vSides[];
-
-
+	in float vScale[];
     in int vType[];
     in mat4 vMat[];
 
@@ -30,8 +29,8 @@ const GLchar* geometryShaderSrc = GLSL(
 
     int calcSides(int sides){
         float dist = distance(aux,vec4(cameraPos,1.0));
-        if(dist > tMat[1][1]*tMat[0][0]*2){
-             return  int(min(sides,max(4.0,(tMat[1][1]*3)*(sides/(dist*0.07)))));
+        if(dist > vScale[0]*2){
+             return  int(min(sides,max(4.0,(vScale[0]/dist)*(vSides[0]*30.0))));
         }
         return sides;
     }
@@ -48,8 +47,9 @@ const GLchar* geometryShaderSrc = GLSL(
 
 
                     //gColor = vec4((sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,1.0);
-                    gColor = gColor * (sin(ang/15+2)+1)*0.5;
-                    gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
+                    //gColor = gColor * (sin(ang)+1)*0.5;
+                    gColor = vec4(vec3((sin(ang)+1)*0.5),1.0);
+					gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
                     vTex = vec2(i/sides,0.0);
                     EmitVertex();
 
@@ -544,6 +544,7 @@ const GLchar* geometryShaderSrc = GLSL(
         switch (vType[0]){
 
             case 1:
+				//box
                 makePrism(1.0,1.0,1.0,4);
             break;
 
@@ -552,6 +553,7 @@ const GLchar* geometryShaderSrc = GLSL(
             break;
 
             case 3:
+				//cylinder
                 makePrism(1.0,1.0,1.0,calcSides(int(vSides[0])));
             break;
             case 4:

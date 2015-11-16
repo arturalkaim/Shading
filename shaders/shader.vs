@@ -7,6 +7,7 @@ const GLchar* vertexShaderSrc = GLSL(
 
     in float type;
     in float sides;
+	in float scale;
 
     uniform mat4 view;
     uniform mat4 projection;
@@ -16,11 +17,13 @@ const GLchar* vertexShaderSrc = GLSL(
 
     out int vType;
     out int vSides;
+	out float vScale;
 
     void main() {
         gl_Position = vec4(0.0, 0.0, 0.0, 1.0); //projection * view * model *
         vType = int(type);
         vSides = int(sides);
+		vScale = scale;
         vMat = mat4(mat_1,mat_2,mat_3,mat_4);
     }
 );
