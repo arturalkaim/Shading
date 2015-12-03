@@ -27,7 +27,7 @@
   (vector-normalizado
    (produtos-cruzados
     (append pts (list (car pts))))))
-
+(u0)
 (define (normal-quadrangulo p0 p1 p2 p3)
   (normal-poligono (list p0 p1 p2 p3)))
 

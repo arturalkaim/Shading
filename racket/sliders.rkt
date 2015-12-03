@@ -166,8 +166,8 @@
     ("Baz" 1 100))
    (("Quux" 1 10)
     ("Yep" 1 100))))
-#;
-(tabbed-sliders
+
+#;(tabbed-sliders
  "Foo4"
  (lambda args (displayln args))
  '(("Tab1"

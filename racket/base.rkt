@@ -2,6 +2,113 @@
 (require
   (prefix-in p3d: pict3d))
 
+(require (prefix-in ffi: "fffidefiner.rkt"))
+;(provide (all-from-out "fffidefiner.rkt"))
+
+(provide (all-defined-out))
+
+
+;;;;;; Obejects functions
+
+(define city ffi:city)
+(define (end_cycle?)
+  (if (< (ffi:end_cycle) 0)
+      #f
+      #t))
+
+(define box ffi:box)
+(define (cylinder p1 radius p2 [r 1.0] [g 1.0] [b 1.0])
+  (let* ([comp (distance p1 p2)]
+         [args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) radius radius comp 20.0 r g b))])
+    (apply ffi:prismpts args)
+    ))
+
+(define (right-cuboid p1 w h p2 [r 1.0] [g 1.0] [b 1.0])
+  (let* ([comp (distance p1 p2)]
+         [args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) w h comp 4.0 r g b))])
+    (apply ffi:prismpts args)
+    )
+  )
+
+(define (pyramid p1 w l p2 [sides 4.0] [r 1.0] [g 1.0] [b 1.0])
+  (let* ([comp (distance p1 p2)]
+         [args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) w l comp sides r g b))])
+    (apply ffi:pyramidpts args)
+    )
+  )
+(define (sphere p1 radius [r 1.0] [g 1.0] [b 1.0])
+  (let* ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) radius r g b))])
+    (apply ffi:sphere args)
+    ))
+
+(define (prism p1 w h p2 sides [r 1.0] [g 1.0] [b 1.0])
+  (let* ([comp (distance p1 p2)]
+         [args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) w h comp sides r g b))])
+    (apply ffi:prismpts args)
+    )
+  )
+
+
+;;;;;;;;;;;;;;;;;;;;; Transformations         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define (rotate id angle vec [r 1.0] [g 1.0] [b 1.0])
+  (display "rotate ")
+  (displayln id)
+  (let ([args (list id angle (cx vec) (cy vec) (cz vec))])
+    (displayln args)
+    (apply ffi:rotate args)
+    )
+  )
+
+;;;;;;;;;;;;;;;;;;;;; rendering functions     ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
+(define init ffi:init)
+(define pool ffi:pool)
+(define clean ffi:clean)
+(define cycle ffi:cycle)
+(define send_data ffi:send_data)
+(define start ffi:start)
+
+
+(define args #f)
+(define fn #f)
+(define changed #f)
+
+(define (setup fun arg)
+  (displayln arg)
+  (init 100)
+  (set! changed #t)
+  (set! fn fun)
+  (set! args arg))
+
+(define (update arg)
+  (displayln arg)
+  (set! changed #t)
+  (set! args arg))
+
+(define (render-scene fn args)
+  (begin
+    (clean)
+    (displayln args)
+    (apply fn args)
+    (send_data)))
+
+(define (while)
+  (unless (end_cycle?)
+    (begin
+      (when changed
+        (begin 
+          (render-scene fn args)
+          (set! changed #f))
+        )
+      (pool)
+      (cycle)
+      (while))))
+;;;;;;;;;;;;
+
+
+;;;;;;;; Auxiliary functions
+
 
 (provide pi/2)
 (define pi/2 (/ pi 2))
@@ -38,7 +145,7 @@
 (define pic-list '())
 
 
-(provide xyz xy xyz?)
+(provide xyz xy xyz? u0)
 (struct xyz (x y z) #:mutable #:transparent)
 (define (xy x y) (xyz x y 0.0))
 (define (xz x z) (xyz x 0.0 z))
@@ -48,7 +155,8 @@
 (define cy xyz-y)
 (define cz xyz-z)
 
-(provide +xyz +xy -xy x+ y+ z+ +xz)
+(define (u0) (xyz 0.0 0.0 0.0))
+;(provide +xyz +xy -xy x+ y+ z+ +xz)
 (define (+xyz p x y z)
   (xyz (+ (cx p) x) (+ (cy p) y) (+ (cz p) z)))
 
@@ -61,13 +169,16 @@
 (define (+xz p dx dz)
   (xyz (+ (cx p) dx) (cy p) (+ (cz p) dz)))
 
-(define (x+ p x)
+(define (+x p x)
   (xyz (+ (cx p) x) (cy p) (cz p)))
 
-(define (y+ p y)
+(define (+y p y)
   (xyz (cx p) (+ (cy p) y) (cz p)))
 
-(define (z+ p z)
+(define (+yz p y z)
+  (xyz (cx p) (+ (cy p) y) (+ (cz p) z)))
+
+(define (+z p z)
   (xyz (cx p) (cy p) (+ (cz p) z)))
 
 (provide =c? +c /c -c *c)
@@ -112,9 +223,11 @@
 (define (mid-point p1 p2)
   (p3d:pos-between (xyz->pos p1) (xyz->pos p2) 1/2))
 (define (norm-c p1)
-  (let ((p  (p3d:dir-normalize (xyz->dir p1) )))
+  (let* ((pw  (p3d:dir-normalize (xyz->dir p1)))
+         (p (if (not (p3d:dir? pw)) (p3d:dir 0.0 0.0 0.0) pw)))
     (xyz (p3d:dir-dx p) (p3d:dir-dy p) (p3d:dir-dz p))))
 
+(define unitize norm-c)
 (define (dir->xyz p)
   (xyz (p3d:dir-dx p) (p3d:dir-dy p) (p3d:dir-dz p)))
 
@@ -194,37 +307,37 @@
 (define (+psi c psi)
   (sph (sph-rho c) (sph-phi c) (+ (sph-psi c) psi)))
 
-(provide box right-cuboid cylinder sphere)
-(define (box p l w h)
-  ;(begin (displayln "box")
-  (set! pic-list (list pic-list (p3d:rectangle (xyz->pos p) (p3d:pos (+ (cx p) l) (+ (cy p) w) (+ (cz p) h))))));)
+#;(provide right-cuboid cylinder sphere)
+#;(define (box p l w h)
+    ;(begin (displayln "box")
+    (set! pic-list (list pic-list (p3d:rectangle (xyz->pos p) (p3d:pos (+ (cx p) l) (+ (cy p) w) (+ (cz p) h))))));)
 
 
-(define (right-cuboid [p (xyz 0 0 0)] [l 1] [w 1] [h 1])
-  (set! pic-list (list pic-list (p3d:rectangle (xyz->pos (z+ p (/ h 2))) (p3d:dir (/ l 2) (/ w 2) (/ h 2))))))
+#;(define (right-cuboid [p (xyz 0 0 0)] [l 1] [w 1] [h 1])
+    (set! pic-list (list pic-list (p3d:rectangle (xyz->pos (z+ p (/ h 2))) (p3d:dir (/ l 2) (/ w 2) (/ h 2))))))
 
 
 
 
 
-(define (cylinder p0 h p1)
-  ;(begin (displayln "cylinder")
-  (if (not (xyz? p1))
-      (set! pic-list  (list pic-list (p3d:cylinder (p3d:pos (cx p0) (cy p0) (+ (/ p1 2 ) (cz p0))) (p3d:dir h h (/ p1 2 )))))
-      (set! pic-list  (list pic-list 
-                            (let ((dir (p3d:dir h h (/ (p3d:dir-dist (p3d:pos- (xyz->pos p1) (xyz->pos p0))) 2)))
-                                  (center (p3d:pos-between (xyz->pos p0) (xyz->pos p1) 1/2)))
-                              (match-let-values
-                               ([(yaw pit) (p3d:dir->angles (p3d:pos- (xyz->pos p1) (xyz->pos p0)))])
-                               (p3d:move
-                                (p3d:rotate-z (p3d:rotate-y (p3d:cylinder p3d:origin dir) (- 90 pit) ) yaw) (pos->dir center))
-                               ))
-                            ))
-      )
-  )
+#;(define (cylinder p0 h p1)
+    ;(begin (displayln "cylinder")
+    (if (not (xyz? p1))
+        (set! pic-list  (list pic-list (p3d:cylinder (p3d:pos (cx p0) (cy p0) (+ (/ p1 2 ) (cz p0))) (p3d:dir h h (/ p1 2 )))))
+        (set! pic-list  (list pic-list 
+                              (let ((dir (p3d:dir h h (/ (p3d:dir-dist (p3d:pos- (xyz->pos p1) (xyz->pos p0))) 2)))
+                                    (center (p3d:pos-between (xyz->pos p0) (xyz->pos p1) 1/2)))
+                                (match-let-values
+                                 ([(yaw pit) (p3d:dir->angles (p3d:pos- (xyz->pos p1) (xyz->pos p0)))])
+                                 (p3d:move
+                                  (p3d:rotate-z (p3d:rotate-y (p3d:cylinder p3d:origin dir) (- 90 pit) ) yaw) (pos->dir center))
+                                 ))
+                              ))
+        )
+    )
 
-(define (sphere p r)
-  (set! pic-list  (list pic-list (p3d:sphere (p3d:pos (cx p) (cy p) (cz p)) r))))
+#;(define (sphere p r)
+    (set! pic-list  (list pic-list (p3d:sphere (p3d:pos (cx p) (cy p) (cz p)) r))))
 
 
 
@@ -288,6 +401,71 @@
        (for/list ((v (division v0 v1 nv lastv?)))
          (f u v))))))
 
+(provide in-interval)
+(define-sequence-syntax in-interval
+  (lambda () #'in-interval/proc)
+  (lambda (stx)
+    (syntax-case stx ()
+      [[(v) (_ from to elems)]
+       #'[(v)
+          (:do-in
+           ([(a) from] [(b) to] [(n) elems])
+           (unless (exact-positive-integer? n)
+             (raise-type-error 'in-interval "exact non-negative integer" n))
+           ([i 0])
+           (<= i n)
+           ([(v) (+ a (/ (* i (- b a)) n))])
+           #true
+           #true
+           ((+ i 1)))]])))
+
+(define (in-interval/proc a b n)
+  (for/list ([t (in-interval a b n)])
+    t))
+
+(provide in-period)
+(define-sequence-syntax in-period
+  (lambda () #'in-period/proc)
+  (lambda (stx)
+    (syntax-case stx ()
+      [[(v) (_ from to elems)]
+       #'[(v)
+          (:do-in
+           ([(a) from] [(b) to] [(n) elems])
+           (unless (exact-positive-integer? n)
+             (raise-type-error 'in-period "exact non-negative integer" n))
+           ([i 0])
+           (< i n)
+           ([(v) (+ a (/ (* i (- b a)) n))])
+           #true
+           #true
+           ((+ i 1)))]])))
+
+(define (in-period/proc a b n)
+  (for/list ([t (in-period a b n)])
+    t))
+
+(provide map-in-interval map-in-period)
+
+(define map-in-interval
+  (case-lambda
+    ((f t0 t1 n)
+     (for/list ((t (in-interval t0 t1 n)))
+       (f t)))
+    ((f u0 u1 nu v0 v1 nv)
+     (for/list ((u (in-interval u0 u1 nu)))
+       (for/list ((v (in-interval v0 v1 nv)))
+         (f u v))))))
+
+(define map-in-period
+  (case-lambda
+    ((f t0 t1 n)
+     (for/list ((t (in-period t0 t1 n)))
+       (f t)))
+    ((f u0 u1 nu v0 v1 nv)
+     (for/list ((u (in-period u0 u1 nu)))
+       (for/list ((v (in-period v0 v1 nv)))
+         (f u v))))))
 
 
 ;;draw receives a list of points (xyz) and returns a list 
