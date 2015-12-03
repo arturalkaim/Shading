@@ -16,7 +16,11 @@ extern "C" int cylinder(float pos_x, float pos_y, float pos_z, float r, float h,
 
 extern "C" int cylinderv(float pos_x, float pos_y, float pos_z, float r, float h, glm::vec3 color);
 
-extern "C" int pyramid(float pos_x, float pos_y, float pos_z, float w, float l, float h, float sides, glm::vec3 color);
+extern "C" int pyramid(float pos_x, float pos_y, float pos_z, float w, float l, float h, float sides, float red, float g, float b);
+
+extern "C" int pyramidpts(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float w, float l, float h, float sides, float red, float g, float b);
+
+extern "C" int pyramidv(float pos_x, float pos_y, float pos_z, float w, float l, float h, float sides, glm::vec3 color);
 
 extern "C" int spherev(float pos_x, float pos_y, float pos_z, float r, glm::vec3 color);
 

@@ -93,6 +93,9 @@ int buildPoint(int n,
 
 	memcpy(points + n*VALUES_PER_POINT, glm::value_ptr(mat), 16 * sizeof(float));
 
+	if (color[0] > 1.0 || color[1] > 1.0 || color[2] > 1.0)
+		color /= 250.0f;
+
 	//printf("%f %f\n", points[n*VALUES_PER_POINT+15], mat[1][1]);
 	points[n*VALUES_PER_POINT + 3] = color[0];
 	points[n*VALUES_PER_POINT + 7] = color[1];
@@ -259,7 +262,19 @@ extern "C" __declspec(dllexport) int cylinderv(float pos_x, float pos_y, float p
 	return buildPoint(n_points, glm::scale(glm::translate(glm::mat4(1.0f), glm::vec3(pos_x, pos_y, pos_z)), glm::vec3(r, r, h)),
 		3, 20, r, color);
 }
-extern "C" __declspec(dllexport) int pyramid(float pos_x, float pos_y, float pos_z, float w, float l, float h, float sides, glm::vec3 color) {
+extern "C" __declspec(dllexport) int pyramid(float pos_x, float pos_y, float pos_z, float w, float l, float h, float sides, float red, float g, float b) {
+	return buildPoint(n_points, glm::scale(
+		glm::translate(
+			glm::mat4(),
+			glm::vec3(pos_x, pos_y, pos_z)),
+		glm::vec3(w, l, h)),
+		4, sides, w, glm::vec3(red, g, b));
+}
+extern "C" __declspec(dllexport) int pyramidpts(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float w, float l, float h, float sides, float red, float g, float b) {
+	return buildPoint(n_points, glm::scale(buildTMatrixFromPoints(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2), glm::vec3(l, w, h)),
+		4, sides, w, glm::vec3(red, g, b));
+}
+extern "C" __declspec(dllexport) int pyramidv(float pos_x, float pos_y, float pos_z, float w, float l, float h, float sides, glm::vec3 color) {
 	return buildPoint(n_points, glm::scale(
 		glm::translate(
 			glm::mat4(),
@@ -646,6 +661,13 @@ GLuint shaderProgram, shaderProgram2;
 glm::mat4 model, view, projection;
 GLint modelLoc, viewLoc, projLoc;
 
+extern "C" __declspec(dllexport) int clean() {
+	vecSize = 10;
+	points = (float *)calloc(sizeof(float), VALUES_PER_POINT*10);
+	n_points = 0;
+	return 0;
+}
+
 extern "C" __declspec(dllexport) int init(int n) {
 	vecSize = n;
 	points = (float *)calloc(sizeof(float), VALUES_PER_POINT*n);
@@ -691,7 +713,7 @@ extern "C" __declspec(dllexport) int init(int n) {
 	glEnable(GL_DEPTH_TEST);                            // Enables Depth Testing
 	glDepthFunc(GL_LEQUAL);                                // The Type Of Depth Testing To Do
 
-
+	glm::vec3 cameraPos = glm::vec3(0.0f, 70.0f, 30.0f);
 														   // Compile and activate shaders
 	GLuint vertexShader = createShader(GL_VERTEX_SHADER, vertexShaderSrc);
 
@@ -1065,7 +1087,7 @@ glm::vec3 buildingColor() {
 	}
 }
 
-void city(int size) {
+extern "C" __declspec(dllexport) void city(int size) {
 	float h, h2;
 	int forestSize = 30;
 	for (int i = -2 * size; i < 2 * size; i += 8)
@@ -1123,11 +1145,11 @@ void forest(int size) {
 
 	}
 	boxv(0.0f, 0.0f, 0.0f, 9 * size, 3 * size, 0.1, GREEN);
-	pyramid(64.0f, 20.0f, 0.1f, 40.0, 15.0, -0.1, 13.0, WATER);
-	pyramid(53.0f, 14.0f, 0.1f, 16.0, 29.0, -0.1, 7.0, WATER);
-	pyramid(-50.0f, -17.0f, 0.1f, 40.0, 20.0, -0.1, 7.0, WATER);
+	pyramidv(64.0f, 20.0f, 0.1f, 40.0, 15.0, -0.1, 13.0, WATER);
+	pyramidv(53.0f, 14.0f, 0.1f, 16.0, 29.0, -0.1, 7.0, WATER);
+	pyramidv(-50.0f, -17.0f, 0.1f, 40.0, 20.0, -0.1, 7.0, WATER);
 
-	pyramid(-80.0f, 0.0f, 0.1f, 15.0, 30.0, -0.1, 20.0, WHITE);
+	pyramidv(-80.0f, 0.0f, 0.1f, 15.0, 30.0, -0.1, 20.0, WHITE);
 }
 
 

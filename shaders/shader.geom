@@ -35,7 +35,7 @@ const GLchar* geometryShaderSrc = GLSL(
         return sides;
     }
 
-    float topColor = rand((tMat * gl_in[0].gl_Position).xy)*0.5+0.25;
+    //float topColor = rand((tMat * gl_in[0].gl_Position).xy)*0.5+0.25;
 
 
     void makePrism(float width, float l,float h, int sides){
@@ -43,12 +43,12 @@ const GLchar* geometryShaderSrc = GLSL(
                 vec4 gColorAux = gColor;
                 for (int i = 0; i <= sides; i++,texAux+=8) {
                     // Angle between each side in radians
-                    float ang = ((PI * 2.0) / sides * i) + (PI / 4);
+                    float ang = ((PI * 2.0) / sides * i);
 
 
                     //gColor = vec4((sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,1.0);
                     //gColor = gColor * (sin(ang)+1)*0.5;
-                    gColor = vec4(vec3((sin(ang)+1)*0.5),1.0);
+					gColor = gColorAux; // * vec4(vec3((sin(ang)+1)*0.4+0.2),1.0);
 					gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
                     vTex = vec2(i/sides,0.0);
                     EmitVertex();
@@ -65,7 +65,7 @@ const GLchar* geometryShaderSrc = GLSL(
                 // Safe, GLfloats can represent small integers exactly
                 for (int i = 0; i <= sides; i++) {
                     // Angle between each side in radians
-                    float ang = ((PI * 2.0) / sides * i) + (PI / 4);
+                    float ang = ((PI * 2.0) / sides * i);
                     if(i%2==(sides%2)){
                         gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,-h,1.0f);
                         vTex = vec2(i/sides,0.0);
@@ -84,7 +84,7 @@ const GLchar* geometryShaderSrc = GLSL(
                 // Safe, GLfloats can represent small integers exactly
                 for (int i = 0; i <= sides; i++) {
                     // Angle between each side in radians
-                    float ang = ((PI * 2.0) / sides * i) + (PI / 4);
+                    float ang = ((PI * 2.0) / sides * i);
                     if(i%2==(sides%2)){
                         gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,h,1.0f);
                         vTex = vec2(i/sides,1.0);
@@ -101,10 +101,11 @@ const GLchar* geometryShaderSrc = GLSL(
     }
 
     void makePir(float width, float l,float h, int sides){
+					vec4 gColorAux = gColor;
                     // Safe, GLfloats can represent small integers exactly
                     for (int i = 0; i <= sides; i++) {
                         // Angle between each side in radians
-                        float ang = ((PI * 2.0) / sides * i) + (PI / 4);
+                        float ang = ((PI * 2.0) / sides * i);
                         //float ang = (PI * 2.0) / vSides[0] * i;
                         //ang -= vTime[0];
                         //if(i%2==0)
@@ -112,7 +113,7 @@ const GLchar* geometryShaderSrc = GLSL(
                         //    EmitVertex();
 
                         ////gColor = vec4(sin(ang/15),sin(ang/15),sin(ang/15),1.0);
-
+						gColor = gColor;// * vec4(vec3((sin(ang)+1)*0.4+0.3),1.0);
                         // Offset from center of point (0.3 to accomodate for aspect ratio)
                         vec4 offset = MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
                         gl_Position = aux + offset;
@@ -126,10 +127,11 @@ const GLchar* geometryShaderSrc = GLSL(
                     }
                     EndPrimitive();
 
+					gColor = gColorAux;
                     // Safe, GLfloats can represent small integers exactly
                     for (int i = 0; i <= sides; i++) {
                         // Angle between each side in radians
-                        float ang = ((PI * 2.0) / sides * i) + (PI / 4);
+                        float ang = ((PI * 2.0) / sides * i);
                         if(i%2==(sides%2)){
                             gl_Position = aux + MVP * tMat * vec4(0.0f,0.0f,-h,1.0f);
                             EmitVertex();
@@ -140,7 +142,6 @@ const GLchar* geometryShaderSrc = GLSL(
                         vec4 offset = MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
                         gl_Position = aux + offset;
                         EmitVertex();
-
                     }
                     EndPrimitive();
                     // Safe, GLfloats can represent small integers exactly
@@ -338,137 +339,7 @@ const GLchar* geometryShaderSrc = GLSL(
     * h - is the hight of the objects
     * divs - is the number of divisions
     */
-    void tree(float h,int divs){
-
-        mat4 m;
-        mat4 m2;
-        mat4 m3;
-
-        float rotAngle = PI/4;
-        //topColor = vec3(0.4,0.1,0.0);
-        gColor = vec4(0.382,0.235,0.149,1.0);
-        float random = rand((tMat * gl_in[0].gl_Position).xy)+1;
-        float x = h*tMat[2][2]*tan(rotAngle);
-        m3 = tMat;
-
-
-        makePrism(1.0, 1.0, h, calcSides(int(20)));
-
-                //tMat = m3;
-        gColor = vec4(0.3,random*0.25+0.1,0.0,1.0);
-        
-        aux = aux + MVP * tMat * vec4(0.0,0.0,3.0*h,1.0);
-        if (random<1.1)
-        {
-            makeSphere1(random*2.5, int(random*5));
-            makeSphere2(random*2.5, int(random*5));
-            makeSphere3(random*2.5, int(random*5));
-        }else
-
-            makePir(random*2.5, random*2.5, 2.0*h, int(random*5));
-
-
-
-        /*
-        
-
-        m = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(-x,0.0,tMat[2][2],1.0));
-
-        m2 = calcRotation(rotAngle,vec3(0.0,1.0,0.0));
-        
-        tMat =  m2 * tMat;
-        aux = MVP * m * tMat * gl_in[0].gl_Position;
-        makePrism(1.0, 1.0, h, calcSides(int(20)));
-        tMat = m3;
-
-        
-        
-        gColor = vec4(0.4,random*0.25+0.3,0.0,1.0);
-        
-        m = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,tMat[2][2],1.0));
-
-       // m2 = calcRotation(0.8*PI,vec3(0.0,1.0,0.0));
-
-       // tMat =  m2 * tMat;
-        //m2 = calcRotation(-0.8*PI,vec3(0.0,1.0,0.0));
-        //tMat = m2 * tMat;
-        aux = aux + MVP * tMat * vec4(0.0,0.0,3.0,1.0);
-        makePir(random+3.5, random+3.5, h, 15);
-
-        //----------------------------------------------------------------------
-        gColor = vec4(0.4,0.15,0.0,1.0);
-        tMat = m3;
-        rotAngle = PI/5;
-        x = h*tMat[2][2]*tan(-rotAngle);
-        m = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(-x,0.0,tMat[2][2]*1.1,1.0));
-
-        m2 = calcRotation(-rotAngle,vec3(0.0,1.0,0.0));
-        
-        tMat =  m2 * tMat;
-        aux = MVP * m * tMat * gl_in[0].gl_Position;
-        makePrism(0.8, 0.8, h, calcSides(int(20)));
-
-
-      
-        //tMat = m3;
-        gColor = vec4(0.4,random*0.25+0.3,0.0,1.0);
-        
-        m = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,tMat[2][2]*1.1,1.0));
-
-        //m2 = calcRotation(0.8*PI,vec3(0.0,1.0,0.0));
-
-        //tMat =  m2 * tMat;
-        //m2 = calcRotation(-0.8*PI,vec3(0.0,1.0,0.0));
-        //tMat = m2 * tMat;
-        aux = aux + MVP * tMat * vec4(0.0,0.0,3.0,1.0);
-        makePir(random+2.5, random+2.5, h, 15);
-        
-        //----------------------------------------------------------------------
-        
-        gColor = vec4(0.4,0.15,0.0,1.0);
-        //tMat = m3;
-        x = 0.0;
-        m = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(-x,0.0,tMat[2][2]*1.1,1.0));
-
-        //m2 = calcRotation(-rotAngle,vec3(0.0,1.0,0.0));
-        
-        //tMat =  m2 * tMat;
-        //aux = MVP * m * tMat * gl_in[0].gl_Position;
-        //makePrism(0.8, 0.8, h, calcSides(int(20)));
-
-
-      
-        //tMat = m3;
-        gColor = vec4(0.4,random*0.25+0.3,0.0,1.0);
-        
-        m = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,tMat[2][2]*1.1,1.0));
-
-       // m2 = calcRotation(0.8*PI,vec3(0.0,1.0,0.0));
-
-       // tMat =  m2 * tMat;
-        //m2 = calcRotation(-0.8*PI,vec3(0.0,1.0,0.0));
-        //tMat = m2 * tMat;
-        aux = aux + MVP * tMat * vec4(0.0,0.0,3.0,1.0);
-        makePir(random+2.5, random+2.5, h, 15);
-
-        */
-        /*for (int i = 1; i < n_blocks; i++){
-
-            m = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,f(i,5),1.0));
-
-            //vMat[0][2][2]*((n_blocks-i+1)*(n_blocks+i)/(2*n_blocks))
-
-            //tMat *= m;
-            //aux = aux + MVP * tMat * vec4(0.0,0.0,1.0,1.0);
-            aux = MVP * m * tMat * gl_in[0].gl_Position;
-            makePrism((6.0-i)/6.0, (6.0-i)/6.0, (5.0-i)/5.0, sides);
-
-        }
-        m = mat4(vec4(1.0,0.0,0.0,0.0),vec4(0.0,1.0,0.0,0.0),vec4(0.0,0.0,1.0,0.0),vec4(0.0,0.0,f(int(n_blocks),5),1.0));
-        aux = MVP * m * tMat * gl_in[0].gl_Position;
-        makePir((6.0-n_blocks)/6.0, (6.0-n_blocks)/6.0, (5.0-n_blocks)/5.0, sides);*/
-
-    }
+  
     /*void makeSphere(float radius, int sides){
         float angle = (2*PI)/sides;
         int p2 = 360 / 2;
@@ -576,7 +447,7 @@ const GLchar* geometryShaderSrc = GLSL(
             break;
 
             case 9:
-                tree(1.0,int(vSides[0]));
+                //tree(1.0,int(vSides[0]));
             break;
 
             default:
