@@ -14,6 +14,7 @@ const GLchar* geometryShaderSrc = GLSL(
 	in float vScale[];
     in int vType[];
     in mat4 vMat[];
+	in float vRatio[];
 
     out vec4 gColor;
     out vec2 vTex;
@@ -37,10 +38,158 @@ const GLchar* geometryShaderSrc = GLSL(
 
     //float topColor = rand((tMat * gl_in[0].gl_Position).xy)*0.5+0.25;
 
+    void makeRegSurface(float width, float l, int sides){
 
-    void makePrism(float width, float l,float h, int sides){
+        // Safe, GLfloats can represent small integers exactly
+        for (int i = 0; i <= sides; i++) {
+            // Angle between each side in radians
+            float ang = ((PI * 2.0) / sides * i) + vRatio[0];
+            if(i%2==(sides%2)){
+                gl_Position = aux + MVP * tMat *  vec4(0.0,0.0,0.0,1.0);
+                vTex = vec2(i/sides,1.0);
+                EmitVertex();
+            }
+            // Offset from center of point (0.3 to accomodate for aspect ratio)
+            gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, 0.0, 1.0);
+            vTex = vec2(i/sides,1.0);
+            EmitVertex();
+        }
+        EndPrimitive();
+
+    }
+
+	void makePoint(float w0, float l0,float h){
+            int texAux=0;
+			float alpha = PI/4;
+			float width = w0/cos(alpha);
+			float l = l0/cos(alpha);
+			int sides = 4;
+            vec4 gColorAux = gColor;
+            for (int i = 0; i <= sides; i++,texAux+=8) {
+                // Angle between each side in radians
+                float ang = ((PI * 2.0) / sides * i);
+
+				gColor = gColorAux * vec4(vec3((sin(ang)+1)*0.4+0.2),1.0);
+				gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
+                EmitVertex();
+
+                //gColor = gColorAux;
+                gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
+                EmitVertex();
+
+            }
+            EndPrimitive();
+
+			gColor = gColorAux;
+            // Safe, GLfloats can represent small integers exactly
+            for (int i = 0; i <= sides; i++) {
+                // Angle between each side in radians
+                float ang = ((PI * 2.0) / sides * i);
+                if(i%2==(sides%2)){
+                    gl_Position = aux + MVP *  vec4(0.0f,0.0f,-h,1.0f);
+                    EmitVertex();
+                }
+
+                //gColor = vec4(1.0,0.5,0.0,1.0);
+                // Offset from center of point (0.3 to accomodate for aspect ratio)
+                gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
+                EmitVertex();
+
+            }
+            EndPrimitive();
+            //gColor = gColorAux;
+            // Safe, GLfloats can represent small integers exactly
+            for (int i = 0; i <= sides; i++) {
+                // Angle between each side in radians
+                float ang = ((PI * 2.0) / sides * i);
+                if(i%2==(sides%2)){
+                    gl_Position = aux + MVP *  vec4(0.0f,0.0f,h,1.0f);
+                    EmitVertex();
+                }
+                //gColor = vec4(topColor,topColor,topColor,1.0);
+                // Offset from center of point (0.3 to accomodate for aspect ratio)
+                gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
+                EmitVertex();
+
+            }
+            EndPrimitive();
+    }
+
+    void makePrism(float w0, float l0,float h, int sides){
+			float alpha = PI/sides;
+			float width = w0/cos(alpha);
+			float l = l0/cos(alpha);
+            int texAux=0;
+            vec4 gColorAux = gColor;
+            for (int i = 0; i <= sides; i++,texAux+=8) {
+                // Angle between each side in radians
+                float ang = ((PI * 2.0) / sides * i);
+
+
+                //gColor = vec4((sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,1.0);
+                //gColor = gColor * (sin(ang)+1)*0.5;
+				gColor = gColorAux * vec4(vec3((sin(ang)+1)*0.4+0.2),1.0);
+				gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
+                vTex = vec2(i/sides,0.0);
+                EmitVertex();
+
+                //gColor = gColorAux;
+                gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
+                vTex = vec2(i/sides,1.0);
+                EmitVertex();
+
+            }
+            EndPrimitive();
+
+			gColor = gColorAux;
+            // Safe, GLfloats can represent small integers exactly
+            for (int i = 0; i <= sides; i++) {
+                // Angle between each side in radians
+                float ang = ((PI * 2.0) / sides * i);
+                if(i%2==(sides%2)){
+                    gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,-h,1.0f);
+                    vTex = vec2(i/sides,0.0);
+                    EmitVertex();
+                }
+
+                //gColor = vec4(1.0,0.5,0.0,1.0);
+                // Offset from center of point (0.3 to accomodate for aspect ratio)
+                gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
+                vTex = vec2(i/sides,0.0);
+                EmitVertex();
+
+            }
+            EndPrimitive();
+            //gColor = gColorAux;
+            // Safe, GLfloats can represent small integers exactly
+            for (int i = 0; i <= sides; i++) {
+                // Angle between each side in radians
+                float ang = ((PI * 2.0) / sides * i);
+                if(i%2==(sides%2)){
+                    gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,h,1.0f);
+                    vTex = vec2(i/sides,1.0);
+                    EmitVertex();
+                }
+                //gColor = vec4(topColor,topColor,topColor,1.0);
+                // Offset from center of point (0.3 to accomodate for aspect ratio)
+                gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
+                vTex = vec2(i/sides,1.0);
+                EmitVertex();
+
+            }
+            EndPrimitive();
+    }
+
+
+
+	void makeTrunk(float w0, float l0,float h, int sides, float ratio){
+				float alpha = PI/sides;
+				float width = w0/cos(alpha);
+				float l = l0/cos(alpha);
                 int texAux=0;
                 vec4 gColorAux = gColor;
+				float width1 = width * ratio;
+				float l1 = l * ratio;
                 for (int i = 0; i <= sides; i++,texAux+=8) {
                     // Angle between each side in radians
                     float ang = ((PI * 2.0) / sides * i);
@@ -48,13 +197,13 @@ const GLchar* geometryShaderSrc = GLSL(
 
                     //gColor = vec4((sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,1.0);
                     //gColor = gColor * (sin(ang)+1)*0.5;
-					gColor = gColorAux; // * vec4(vec3((sin(ang)+1)*0.4+0.2),1.0);
+					gColor = gColorAux * vec4(vec3((sin(ang)+1)*0.4+0.2),1.0);
 					gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
                     vTex = vec2(i/sides,0.0);
                     EmitVertex();
 
                     //gColor = gColorAux;
-                    gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
+                    gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width1, -sin(ang) * l1, h, 1.0);
                     vTex = vec2(i/sides,1.0);
                     EmitVertex();
 
@@ -92,7 +241,7 @@ const GLchar* geometryShaderSrc = GLSL(
                     }
                     //gColor = vec4(topColor,topColor,topColor,1.0);
                     // Offset from center of point (0.3 to accomodate for aspect ratio)
-                    gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
+                    gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width1, -sin(ang) * l1, h, 1.0);
                     vTex = vec2(i/sides,1.0);
                     EmitVertex();
 
@@ -113,7 +262,7 @@ const GLchar* geometryShaderSrc = GLSL(
                         //    EmitVertex();
 
                         ////gColor = vec4(sin(ang/15),sin(ang/15),sin(ang/15),1.0);
-						gColor = gColor;// * vec4(vec3((sin(ang)+1)*0.4+0.3),1.0);
+						gColor = gColor * vec4(vec3((sin(ang)+1)*0.4+0.3),1.0);
                         // Offset from center of point (0.3 to accomodate for aspect ratio)
                         vec4 offset = MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
                         gl_Position = aux + offset;
@@ -413,7 +562,9 @@ const GLchar* geometryShaderSrc = GLSL(
 
         //gColor = vec4(0.1,0.67,0.3,1.0);
         switch (vType[0]){
-
+			case 0:
+				makePoint(1.0,1.0,1.0);
+			break;
             case 1:
 				//box
                 makePrism(1.0,1.0,1.0,4);
@@ -447,7 +598,12 @@ const GLchar* geometryShaderSrc = GLSL(
             break;
 
             case 9:
-                //tree(1.0,int(vSides[0]));
+                makeTrunk(1.0,1.0,1.0,calcSides(int(vSides[0])), vRatio[0]);
+				//tree(1.0,int(vSides[0]));
+            break;
+
+            case 10:
+                makeRegSurface(1.0,1.0,int(vSides[0]));
             break;
 
             default:

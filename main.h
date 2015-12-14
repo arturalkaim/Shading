@@ -1,4 +1,5 @@
 #include <glm/glm.hpp>
+extern "C" int point(float pos_x, float pos_y, float pos_z, float w, float red, float g, float b);
 
 extern "C" int building(float pos_x, float pos_y, float pos_z, float w, float l, float h, int divs, float r, float g, float b);
 
@@ -11,6 +12,8 @@ extern "C" int boxv(float pos_x, float pos_y, float pos_z, float w, float l, flo
 extern "C" int box(float pos_x, float pos_y, float pos_z, float w, float l, float h, float red, float g, float b, float angle, float vx, float vy, float vz);
 
 extern "C" int prism(float pos_x, float pos_y, float pos_z, float l, float w, float h, float sides, float red, float g, float b, float angle, float vx, float vy, float vz);
+
+extern "C" int trunkpts(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float l, float w, float h, float w1, float h1, float sides, float red, float g, float b);
 
 extern "C" int cylinder(float pos_x, float pos_y, float pos_z, float r, float h, float red, float g, float b, float angle, float vx, float vy, float vz);
 
@@ -25,6 +28,8 @@ extern "C" int pyramidv(float pos_x, float pos_y, float pos_z, float w, float l,
 extern "C" int spherev(float pos_x, float pos_y, float pos_z, float r, glm::vec3 color);
 
 extern "C" int sphere(float pos_x, float pos_y, float pos_z, float r, float red, float g, float b);
+
+extern "C" int regSurface(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float sides, float w, float l, float red, float g, float b, float angle);
 
 extern "C" int rotate(int n,
 	float angle = 0.0f,
