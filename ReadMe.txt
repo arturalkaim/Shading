@@ -1,5 +1,6 @@
- Master Thesis : Fast Visualization of Large Architectural Models
-#######
+Master Thesis : Fast Visualization of Large Architectural Models
+=========
+
 ## Abstract:
 Architects and designers, to create their models, largely use \gls{CAD} tools. This tools are very powerful for modeling and manipulation of this models, but they are mostly geared for manual use. Unfortunately, the manual production of large amounts geometry is very time consuming.
 
