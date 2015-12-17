@@ -5,6 +5,7 @@
 #include "shaders/shader.vs"
 
 #include "shaders/shader.geom"
+#include "shaders/shader.geom1"
 
 #include "shaders/shader.frag"
 
