@@ -41,7 +41,7 @@ extern "C" int move(int n,
 extern "C" int scale(int n,
 	float vx = 0.0f, float vy = 0.0f, float vz = 0.0f);
 
-
+extern "C" int setView(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2);
 
 extern "C" int init(int n);
 

@@ -23,6 +23,12 @@ int vecSize = 10;
 GLfloat* points = (float *)calloc(sizeof(float), VALUES_PER_POINT * 10);
 
 
+// Camera
+glm::vec3 cameraPos = glm::vec3(0.0f, 70.0f, 30.0f);
+glm::vec3 cameraFront = glm::vec3(0.0f, -1.0f, 0.0f);
+glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, 1.0f);
+glm::vec3 posLookAt = glm::vec3(0.0f);
+bool keys[1024];
 
 float* buildPoints(int n) {
 	float* ret = (float *)malloc(sizeof(float)*VALUES_PER_POINT*n);
@@ -385,6 +391,14 @@ extern "C" __declspec(dllexport) int regSurface(float pos_x, float pos_y, float 
 }
 
 
+extern "C" __declspec(dllexport) int setView(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2){
+
+	cameraPos = glm::vec3(pos_x, pos_y, pos_z);
+	cameraUp = glm::vec3(0.0f, 0.0f, 1.0f);
+	posLookAt = glm::vec3(pos_x_2, pos_y_2, pos_z_2);
+	return 0;
+}
+
 extern "C" __declspec(dllexport) int rotate(int n,
 	float angle,
 	float vx, float vy, float vz) {
@@ -495,19 +509,31 @@ static const GLfloat tex_color_data[] =
 };
 
 
-// Camera
-glm::vec3 cameraPos = glm::vec3(0.0f, 70.0f, 30.0f);
-glm::vec3 cameraFront = glm::vec3(0.0f, -1.0f, 0.0f);
-glm::vec3 cameraUp = glm::vec3(0.0f, 0.0f, 1.0f);
-glm::vec3 posLookAt = glm::vec3(0.0f);
-bool keys[1024];
+bool firstMouse = true;
+const GLuint WIDTH = 1250, HEIGHT = 800;
+GLfloat yaw = -90.0f;	// Yaw is initialized to -90.0 degrees since a yaw of 0.0 results in a direction vector pointing to the right (due to how Eular angles work) so we initially rotate a bit to the left.
+GLfloat pitch = 0.0f;
+GLfloat lastX = WIDTH / 2.0;
+GLfloat lastY = HEIGHT / 2.0;
+GLfloat fov = 45.0f;
+double xpos_1, ypos_1, xpos_2, ypos_2, speed = 1;
+GLenum pressed = GL_FALSE;
 
 void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{
+{/*
+	if (fov >= 1.0f && fov <= 45.0f)
+		fov -= yoffset;
+	if (fov <= 1.0f)
+		fov = 1.0f;
+	if (fov >= 45.0f)
+		fov = 45.0f;
+		*/
+	
 	if (std::abs(xoffset) < std::abs(yoffset))
 		cameraPos += ((GLfloat)yoffset * 0.1f) * cameraUp;
 	else
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * ((GLfloat)yoffset) * 40.0f;
+	
 }
 // Is called whenever a key is pressed/released via GLFW
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
@@ -525,8 +551,7 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 
 
 }
-double xpos_1, ypos_1, xpos_2, ypos_2, speed = 1;
-GLenum pressed = GL_FALSE;
+
 
 void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 {
@@ -540,6 +565,45 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 	}
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
 		posLookAt = glm::vec3(0.0f);
+}
+
+
+void mouse_callback(GLFWwindow* window, double xpos, double ypos)
+{
+	if (!pressed)
+	{
+		return;
+	}
+	if (firstMouse)
+	{
+		lastX = xpos;
+		lastY = ypos;
+		firstMouse = false;
+	}
+
+	GLfloat xoffset = xpos - lastX;
+	GLfloat yoffset = lastY - ypos; // Reversed since y-coordinates go from bottom to left
+	lastX = xpos;
+	lastY = ypos;
+
+	GLfloat sensitivity = 0.05;	// Change this value to your liking
+	xoffset *= sensitivity;
+	yoffset *= sensitivity;
+
+	yaw += xoffset;
+	pitch += yoffset;
+
+	// Make sure that when pitch is out of bounds, screen doesn't get flipped
+	if (pitch > 89.0f)
+		pitch = 89.0f;
+	if (pitch < -89.0f)
+		pitch = -89.0f;
+
+	glm::vec3 front;
+	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
+	front.y = sin(glm::radians(pitch));
+	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
+	cameraFront = glm::normalize(front);
 }
 
 void do_movement() {
@@ -706,8 +770,8 @@ double calcFPS(GLFWwindow* window, double timeInterval = 1.0, std::string window
 
 GLuint vbo;
 GLFWwindow* window;
-GLenum shader1 = GL_TRUE;
-GLuint shaderProgram, shaderProgram2;
+int shaderid = 0;
+GLuint shaderProgram, shaderProgram1;
 glm::mat4 model, view, projection;
 GLint modelLoc, viewLoc, projLoc;
 
@@ -721,7 +785,7 @@ extern "C" __declspec(dllexport) int clean() {
 extern "C" __declspec(dllexport) int init(int n) {
 	vecSize = n;
 	points = (float *)calloc(sizeof(float), VALUES_PER_POINT*n);
-	const GLuint WIDTH = 1250, HEIGHT = 800;
+	
 
 	glfwInit();
 
@@ -746,8 +810,10 @@ extern "C" __declspec(dllexport) int init(int n) {
 	// Set the required callback functions
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetScrollCallback(window, scroll_callback);
+	//glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
-
+	// GLFW Options
+	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Initialize GLEW
 	glewExperimental = GL_TRUE;
@@ -768,26 +834,36 @@ extern "C" __declspec(dllexport) int init(int n) {
 	GLuint vertexShader = createShader(GL_VERTEX_SHADER, vertexShaderSrc);
 
 	GLuint geometryShader = createShader(GL_GEOMETRY_SHADER, geometryShaderSrc);
-	//GLuint geometryShader2 = createShader(GL_GEOMETRY_SHADER, geometryShaderSrc2);
+	GLuint geometryShader1 = createShader(GL_GEOMETRY_SHADER, geometryShaderSrc1);
 
 	GLuint fragmentShader = createShader(GL_FRAGMENT_SHADER, fragmentShaderSrc);
 
 	GLuint tessEvalShader = createShader(GL_TESS_EVALUATION_SHADER, tesselationEvalShaderSrc);
 	GLuint tessCtrlShader = createShader(GL_TESS_CONTROL_SHADER, tesselationCtrlShaderSrc);
 
+	
 	shaderProgram = glCreateProgram();
+	shaderProgram1 = glCreateProgram();
 
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, geometryShader);
-	//glAttachShader(shaderProgram, geometryShader2);
 	glAttachShader(shaderProgram, fragmentShader);
 	//glAttachShader(shaderProgram, tessEvalShader);
 	//glAttachShader(shaderProgram, tessCtrlShader);
+	glAttachShader(shaderProgram1, vertexShader);
+	glAttachShader(shaderProgram1, geometryShader1);
+	glAttachShader(shaderProgram1, fragmentShader);
+
+
 	glLinkProgram(shaderProgram);
 
 
 	glUseProgram(shaderProgram);
 
+	glLinkProgram(shaderProgram1);
+
+
+	//glUseProgram(shaderProgram1);
 
 	// Create VBO with point coordinates
 
@@ -842,12 +918,18 @@ extern "C" __declspec(dllexport) int init(int n) {
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 1, GL_FLOAT, GL_FALSE, VALUES_PER_POINT * sizeof(GLfloat), (void*)(19 * sizeof(GLfloat)));
 
+
+	// Camera/View transformation
+	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	// Projection 
+	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+
 	// Create transformations
 	model = glm::mat4(1.0f);
-	view = glm::mat4(1.0f);
+	/*view = glm::mat4(1.0f);
 	projection = glm::mat4(1.0f);
 	projection = glm::perspective(glm::radians(45.0f), (GLfloat)width / (GLfloat)height, 0.1f, 1000.0f);
-
+	*/
 	// Get their uniform location
 	modelLoc = glGetUniformLocation(shaderProgram, "model");
 	viewLoc = glGetUniformLocation(shaderProgram, "view");
@@ -927,7 +1009,12 @@ extern "C" __declspec(dllexport) void cycle() {
 	//printf("Testing Cycle %d\n",TestCycle++);
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
-
+	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
+		shaderid = 0;
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		shaderid = 1;
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+		shaderid = 2;
 	//        if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS){
 
 	/*if ( cycle_n++ == -10 ){
@@ -949,9 +1036,13 @@ extern "C" __declspec(dllexport) void cycle() {
 	// Clear the colorbuffer
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	
 
+	// Projection 
+	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
 	//       posLookAt = glm::vec3(0.0f);
-	view = glm::lookAt(cameraPos, posLookAt, cameraUp);
+	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	//view = glm::lookAt(cameraPos, posLookAt, cameraUp);
 	//view = glm::lookAt(glm::vec3(camX, camY, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));//        model = glm::mat4(1.0f);
 	//view = glm::mat4(1.0f);
 	//projection = glm::mat4(1.0f);
@@ -964,18 +1055,52 @@ extern "C" __declspec(dllexport) void cycle() {
 
 	// Pass them to the shaders
 	glm::mat4 mvp = projection * view * model;
-	glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+
 	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
 	//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
 	//glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-	glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
-	glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
+
 
 	//printf("Testing n_points %d\n",n_points);
 	//        glEnable(GL_LINE_SMOOTH);
 	//        glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-	glDrawArrays(GL_POINTS, 0, n_points);
-
+	
+	switch (shaderid)
+	{
+	case 0:
+		glUseProgram(shaderProgram);
+		glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+		glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
+		glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
+		glDrawArrays(GL_POINTS, 0, n_points);
+		break;
+	case 1:
+		glUseProgram(shaderProgram1);
+		glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+		glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
+		glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
+		glDrawArrays(GL_POINTS, 0, n_points);
+		break;
+	case 2:
+		glUseProgram(shaderProgram1);
+		glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+		glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
+		glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
+		glDrawArrays(GL_POINTS, 0, n_points);
+		glUseProgram(shaderProgram);
+		glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+		glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
+		glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
+		glDrawArrays(GL_POINTS, 0, n_points);
+		break;
+	default:
+		glUseProgram(shaderProgram);
+		glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+		glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
+		glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
+		glDrawArrays(GL_POINTS, 0, n_points);
+		break;
+	}
 
 	/*        n_points=0;
 	city(100);
@@ -1037,13 +1162,13 @@ extern "C" __declspec(dllexport) int start() {
 			glfwSetWindowShouldClose(window, GL_TRUE);
 
 		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-			shader1 = !shader1;
+			shaderid = shaderid++%3;
 
 
-		if (shader1)
+		if (shaderid == 0)
 			glUseProgram(shaderProgram);
 		else
-			glUseProgram(shaderProgram2);
+			glUseProgram(shaderProgram1);
 		// Clear the colorbuffer
 		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
