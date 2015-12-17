@@ -535,6 +535,7 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * ((GLfloat)yoffset) * 40.0f;
 	
 }
+int shaderid = 0;
 // Is called whenever a key is pressed/released via GLFW
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
@@ -549,6 +550,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			keys[key] = false;
 	}
 
+	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+		shaderid = 0;
+	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+		shaderid = 1;
+	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+		shaderid = 2;
 
 }
 
@@ -770,7 +777,7 @@ double calcFPS(GLFWwindow* window, double timeInterval = 1.0, std::string window
 
 GLuint vbo;
 GLFWwindow* window;
-int shaderid = 0;
+
 GLuint shaderProgram, shaderProgram1;
 glm::mat4 model, view, projection;
 GLint modelLoc, viewLoc, projLoc;
@@ -1009,12 +1016,7 @@ extern "C" __declspec(dllexport) void cycle() {
 	//printf("Testing Cycle %d\n",TestCycle++);
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
-	if (glfwGetKey(window, GLFW_KEY_0) == GLFW_PRESS)
-		shaderid = 0;
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
-		shaderid = 1;
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
-		shaderid = 2;
+
 	//        if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS){
 
 	/*if ( cycle_n++ == -10 ){
