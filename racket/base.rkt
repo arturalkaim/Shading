@@ -48,10 +48,44 @@
     )
   )
 
+(define (trunk p1 w0 h0 w1 h1 p2 sides [r 1.0] [g 1.0] [b 1.0])
+  (let* ([comp (distance p1 p2)]
+         [args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) w0 h0 w1 h1 comp sides r g b))])
+    (apply ffi:trunkpts args)
+    )
+  )
+
+(define (reg-surface p1 sides w l v1 [alpha 0.0] [r 1.0] [g 1.0] [b 1.0])
+  (let* ([p2 (+c p1 v1)]
+         [args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) sides w l r g b alpha))])
+    (apply ffi:regSurface args)
+    )
+  )
+(define (reg-line p1 sides w l v1 [alpha 0.0] [r 1.0] [g 1.0] [b 1.0])
+  (let* ([p2 (+c p1 v1)]
+         [args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) sides w l r g b alpha))])
+    (apply ffi:regLine args)
+    )
+  )
+
+(define (point p1 [r 1.0] [g 1.0] [b 1.0])
+  (let* ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) 0.1 r g b))])
+    (apply ffi:point args)
+    )
+  #;(let* ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) 1.5 1.5 1.5 r g b 0.0 0.0 0.0 0.0))])
+      (apply ffi:box args)
+      )
+  )
 
 ;;;;;;;;;;;;;;;;;;;;; Transformations         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(define (rotate id angle vec [r 1.0] [g 1.0] [b 1.0])
+(define (view camera-pos camera-look-at)
+  (let ([args (map exact->inexact (list (cx camera-pos) (cy camera-pos) (cz camera-pos) (cx camera-look-at) (cy camera-look-at) (cz camera-look-at)))])
+    (apply ffi:setView args)
+    )
+  )
+
+(define (rotate id angle vec)
   (display "rotate ")
   (displayln id)
   (let ([args (list id angle (cx vec) (cy vec) (cz vec))])

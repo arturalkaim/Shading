@@ -66,5 +66,13 @@
 (defffi "int box(float pos_x, float pos_y, float pos_z, float w, float l, float h, float red, float g, float b, float angle, float vx, float vy, float vz)")
 (defffi "int sphere(float pos_x, float pos_y, float pos_z, float r, float red, float g, float b)")
 (defffi "int pyramid(float pos_x, float pos_y, float pos_z, float w, float l, float h, float sides, float red, float g, float b)")
+(defffi "int trunkpts(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float l, float w, float h, float w1, float h1, float sides, float red, float g, float b)")
 (defffi "int pyramidpts(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float w, float l, float h, float sides, float red, float g, float b)")
+(defffi "int regSurface(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float sides, float w, float l, float red, float g, float b, float angle)")
+(defffi "int regLine(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float sides, float w, float l, float red, float g, float b, float angle)")
+
+(defffi "int point(float pos_x, float pos_y, float pos_z, float w, float red, float g, float b)")
+
+
+(defffi "int setView(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2)")
 (defffi "int rotate(int n, float angle, float vx, float vy, float vz)")

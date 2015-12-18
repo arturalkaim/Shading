@@ -32,14 +32,14 @@
 (define truss-node-radius (make-parameter 0.08))
 
 (define (no-trelica p)
-  (sphere p (truss-node-radius)))
+  (sphere p (truss-node-radius) 0.7 0.7 0.7))
 
 (define truss-radius-bar (make-parameter 0.01))
 
 (define (barra-trelica p0 p1)
   (when (not (=c? p0 p1))
     ; (empty-shape)
-    (cylinder p0 (truss-radius-bar) p1)))
+    (cylinder p0 (truss-radius-bar) p1  0.6 0.6 0.6)))
 
 (define (nos-trelica ps)
   (map no-trelica ps))
@@ -159,6 +159,7 @@
 (displayln "START")
 
 (define (truss n sizex sizey)
+  
   (render-truss (sin-u*v  n sizex sizey)))
 ;(trace while cycle pool)
 (setup truss (list 20 10 10))
@@ -169,12 +170,30 @@
    (thread while)))
 
 
+
+(define (animate)
+  (for
+      (
+       ;[n (in-range 5 70 5)]
+       [x (in-range 5 30 2)]
+       [y (in-range 5 20 1)])
+    (begin (sleep 0.1)
+    (update (list 30 x y)))
+    ))
+
+
+#;(animate)
 (sliders
  "Truss"
- (lambda (n sizex sizey) (update (list n sizex sizey)))
+ (lambda (n sizex sizey angle cam-z)
+   (begin
+     (view (cyl 100.0 (/ angle 10) cam-z) (u0))
+     (update (list n sizex sizey))))
  '(("n" 5 50 20)
    ("sizex" 1 20 10)
-   ("sizey" 1 20 10)))
+   ("sizey" 1 20 10)
+   ("angle" -70 70 0)
+   ("cam-z" -100 100 0)))
 ;(pyramid (xyz 0.0 0.0 0.0) 10.0 10.0 (xyz 0.0 0.0 5.0) 1.0 0.0 1.0)
 
 
@@ -182,7 +201,7 @@
 
 ;(cylinder 0.0 0.0 0.0 10.0 5.4 0.0 0.0 0.0 29.0 0.0 1.0 0.0)
 ;(cylinder-p (xyz 0.0 0.0 0.0) 2.0 (xyz 10.0 5.4 0.0))
-
+;(read)
 (displayln "END")
 
 
