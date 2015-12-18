@@ -21,6 +21,7 @@ const float PI = 3.1415926;
 int n_points = 0;
 int vecSize = 10;
 GLfloat* points = (float *)calloc(sizeof(float), VALUES_PER_POINT * 10);
+GLfloat* points_lines = (float *)calloc(sizeof(float), VALUES_PER_POINT * 10);
 
 
 // Camera
@@ -390,6 +391,11 @@ extern "C" __declspec(dllexport) int regSurface(float pos_x, float pos_y, float 
 		10, sides, l, glm::vec3(red, g, b),angle);
 }
 
+extern "C" __declspec(dllexport) int regLine(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2,
+	float sides, float w, float l, float red, float g, float b, float angle) {
+	return buildPoint(n_points, glm::scale(buildTMatrixFromPointVec(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2), glm::vec3(w, l, 0.0f)),
+		11, sides, l, glm::vec3(red, g, b), angle);
+}
 
 extern "C" __declspec(dllexport) int setView(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2){
 
@@ -550,11 +556,11 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 			keys[key] = false;
 	}
 
-	if (glfwGetKey(window, GLFW_KEY_1) == GLFW_PRESS)
+	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
 		shaderid = 0;
-	if (glfwGetKey(window, GLFW_KEY_2) == GLFW_PRESS)
+	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
 		shaderid = 1;
-	if (glfwGetKey(window, GLFW_KEY_3) == GLFW_PRESS)
+	if (key == GLFW_KEY_3 && action == GLFW_PRESS)
 		shaderid = 2;
 
 }
@@ -778,7 +784,7 @@ double calcFPS(GLFWwindow* window, double timeInterval = 1.0, std::string window
 GLuint vbo;
 GLFWwindow* window;
 
-GLuint shaderProgram, shaderProgram1;
+GLuint shaderProgram, shaderProgram1, shaderProgram2;
 glm::mat4 model, view, projection;
 GLint modelLoc, viewLoc, projLoc;
 
@@ -842,6 +848,7 @@ extern "C" __declspec(dllexport) int init(int n) {
 
 	GLuint geometryShader = createShader(GL_GEOMETRY_SHADER, geometryShaderSrc);
 	GLuint geometryShader1 = createShader(GL_GEOMETRY_SHADER, geometryShaderSrc1);
+	GLuint geometryShader2 = createShader(GL_GEOMETRY_SHADER, geometryShaderSrc2);
 
 	GLuint fragmentShader = createShader(GL_FRAGMENT_SHADER, fragmentShaderSrc);
 
@@ -851,6 +858,7 @@ extern "C" __declspec(dllexport) int init(int n) {
 	
 	shaderProgram = glCreateProgram();
 	shaderProgram1 = glCreateProgram();
+	shaderProgram2 = glCreateProgram();
 
 	glAttachShader(shaderProgram, vertexShader);
 	glAttachShader(shaderProgram, geometryShader);
@@ -861,14 +869,15 @@ extern "C" __declspec(dllexport) int init(int n) {
 	glAttachShader(shaderProgram1, geometryShader1);
 	glAttachShader(shaderProgram1, fragmentShader);
 
+	glAttachShader(shaderProgram2, vertexShader);
+	glAttachShader(shaderProgram2, geometryShader2);
+	glAttachShader(shaderProgram2, fragmentShader);
 
 	glLinkProgram(shaderProgram);
 
-
-	glUseProgram(shaderProgram);
-
 	glLinkProgram(shaderProgram1);
 
+	glLinkProgram(shaderProgram2);
 
 	//glUseProgram(shaderProgram1);
 
@@ -1066,7 +1075,7 @@ extern "C" __declspec(dllexport) void cycle() {
 	//printf("Testing n_points %d\n",n_points);
 	//        glEnable(GL_LINE_SMOOTH);
 	//        glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
-	
+
 	switch (shaderid)
 	{
 	case 0:
@@ -1103,7 +1112,11 @@ extern "C" __declspec(dllexport) void cycle() {
 		glDrawArrays(GL_POINTS, 0, n_points);
 		break;
 	}
-
+	glUseProgram(shaderProgram2);
+	glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+	glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
+	glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
+	glDrawArrays(GL_POINTS, 0, n_points);
 	/*        n_points=0;
 	city(100);
 	send_data();

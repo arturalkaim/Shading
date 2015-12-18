@@ -607,7 +607,7 @@ const GLchar* geometryShaderSrc = GLSL(
             break;
 
             default:
-                makeSphere(10.0,calcSides(int(vSides[0])));
+                 break;
         }
         
 
