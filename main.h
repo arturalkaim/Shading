@@ -5,6 +5,10 @@ extern "C" int building(float pos_x, float pos_y, float pos_z, float w, float l,
 
 extern "C" int buildingv(float pos_x, float pos_y, float pos_z, float w, float l, float h, int divs, glm::vec3 color);
 
+extern "C" int irregularPyramid3(float x_bottom, float y_bottom, float z_bottom, float x_up, float y_up, float z_up,
+	float p_1_length, float p_1_angle, float p_2_length, float p_2_angle, float p_3_length, float p_3_angle,
+	float r, float g, float b);
+
 extern "C" int tree(float pos_x, float pos_y, float pos_z, float w, float l, float h, int divs, glm::vec3 color);
 
 extern "C" int boxv(float pos_x, float pos_y, float pos_z, float w, float l, float h, glm::vec3 color);

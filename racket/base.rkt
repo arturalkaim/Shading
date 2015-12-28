@@ -68,6 +68,13 @@
     )
   )
 
+(define (irregularPyramid3 p1 p2 l1 a1 l2 a2 l3 a3 [r 1.0] [g 1.0] [b 1.0])
+  (let ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) l1 a1 l2 a2 l3 a3 r g b))])
+    (apply ffi:irregularPyramid3 args)
+    )
+  )
+
+
 (define (point p1 [r 1.0] [g 1.0] [b 1.0])
   (let* ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) 0.1 r g b))])
     (apply ffi:point args)

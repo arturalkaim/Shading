@@ -71,6 +71,8 @@
 (defffi "int regSurface(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float sides, float w, float l, float red, float g, float b, float angle)")
 (defffi "int regLine(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float sides, float w, float l, float red, float g, float b, float angle)")
 
+(defffi "int irregularPyramid3(float x_bottom, float y_bottom, float z_bottom, float x_up, float y_up, float z_up, float p_1_length, float p_1_angle, float p_2_length, float p_2_angle, float p_3_length, float p_3_angle, float r, float g, float b)")
+
 (defffi "int point(float pos_x, float pos_y, float pos_z, float w, float red, float g, float b)")
 
 

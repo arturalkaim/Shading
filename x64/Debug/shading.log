@@ -1,4 +1,4 @@
-﻿Build started 03/12/2015 16:01:16.
+﻿Build started 28/12/2015 16:44:50.
      1>Project "C:\Users\DEMO\documents\visual studio 2015\Projects\shading\shading\shading.vcxproj" on node 2 (Rebuild target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /I"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glew-1.13.0\include" /I"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glm-0.9.7.1\glm" /I"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glfw-3.1.2.bin.WIN64\include" /I"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\shading" /ZI /nologo /W3 /WX- /Od /D _DEBUG /D _WINDOWS /D _USRDLL /D SHADING_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TC /errorReport:prompt "..\glew-1.13.0\src\glew.c"
@@ -6284,35 +6284,43 @@
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\CL.exe /c /I"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glew-1.13.0\include" /I"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glm-0.9.7.1\glm" /I"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glfw-3.1.2.bin.WIN64\include" /I"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\shading" /ZI /nologo /W3 /WX- /Od /D _DEBUG /D _WINDOWS /D _USRDLL /D SHADING_EXPORTS /D _WINDLL /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"x64\Debug\\" /Fd"x64\Debug\vc140.pdb" /Gd /TP /errorReport:prompt shading.cpp
          shading.cpp
      1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(18): warning C4305: 'initializing': truncation from 'double' to 'float'
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(36): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(188): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(217): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(222): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(228): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1101): warning C4305: 'argument': truncation from 'double' to 'float'
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1101): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1104): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1108): warning C4305: 'argument': truncation from 'double' to 'float'
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1108): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1091): warning C4101: 'h2': unreferenced local variable
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1119): warning C4305: 'argument': truncation from 'double' to 'float'
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1119): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1119): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1126): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1128): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1132): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1132): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1132): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1143): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1143): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1143): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1147): warning C4305: 'argument': truncation from 'double' to 'float'
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1147): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1148): warning C4305: 'argument': truncation from 'double' to 'float'
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1149): warning C4305: 'argument': truncation from 'double' to 'float'
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1150): warning C4305: 'argument': truncation from 'double' to 'float'
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1152): warning C4305: 'argument': truncation from 'double' to 'float'
-     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1113): warning C4101: 'h2': unreferenced local variable
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(43): warning C4244: '=': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(195): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(240): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(278): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(283): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(289): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(615): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(616): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(620): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(621): warning C4244: 'initializing': conversion from 'double' to 'GLfloat', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(622): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(623): warning C4244: '=': conversion from 'double' to 'GLfloat', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(625): warning C4305: 'initializing': truncation from 'double' to 'GLfloat'
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1320): warning C4305: 'argument': truncation from 'double' to 'float'
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1320): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1323): warning C4244: 'argument': conversion from 'double' to 'int', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1327): warning C4305: 'argument': truncation from 'double' to 'float'
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1327): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1310): warning C4101: 'h2': unreferenced local variable
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1338): warning C4305: 'argument': truncation from 'double' to 'float'
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1338): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1338): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1345): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1347): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1351): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1351): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1351): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1362): warning C4244: 'argument': conversion from 'float' to 'int', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1362): warning C4244: 'argument': conversion from 'double' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1362): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1366): warning C4305: 'argument': truncation from 'double' to 'float'
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1366): warning C4244: 'argument': conversion from 'int' to 'float', possible loss of data
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1367): warning C4305: 'argument': truncation from 'double' to 'float'
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1368): warning C4305: 'argument': truncation from 'double' to 'float'
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1369): warning C4305: 'argument': truncation from 'double' to 'float'
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1371): warning C4305: 'argument': truncation from 'double' to 'float'
+     1>c:\users\demo\documents\visual studio 2015\projects\shading\shading\shading.cpp(1332): warning C4101: 'h2': unreferenced local variable
        Link:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\x86_amd64\link.exe /ERRORREPORT:PROMPT /OUT:"C:\Users\DEMO\documents\visual studio 2015\Projects\shading\x64\Debug\shading.dll" /INCREMENTAL /NOLOGO /LIBPATH:"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glew-1.13.0\lib\Release\x64" /LIBPATH:"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glew-1.13.0\bin\Release\x64" /LIBPATH:"C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glfw-3.1.2.bin.WIN64\lib-vc2015" opengl32.lib glfw3.lib kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /MANIFEST /MANIFESTUAC:"level='asInvoker' uiAccess='false'" /manifest:embed /Debug /PDB:"C:\Users\DEMO\documents\visual studio 2015\Projects\shading\x64\Debug\shading.pdb" /SUBSYSTEM:CONSOLE /TLBID:1 /DYNAMICBASE /NXCOMPAT /IMPLIB:"C:\Users\DEMO\documents\visual studio 2015\Projects\shading\x64\Debug\shading.lib" /MACHINE:X64 /DLL x64\Debug\glew.obj
          x64\Debug\shading.obj
@@ -6323,4 +6331,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.68
+Time Elapsed 00:00:01.69

@@ -216,6 +216,20 @@ glm::mat4 buildTMatrixFromPoints(float pos_x, float pos_y, float pos_z, float po
 
 	return matFromVecs(o,vx,vy,vz);
 }
+
+glm::mat4 buildTMatrixFromIrregularPoint(float x_bottom, float y_bottom, float z_bottom, float x_up, float y_up, float z_up,
+	float p_1_length, float p_1_angle, float p_2_length, float p_2_angle, float p_3_length, float p_3_angle) {
+	
+	glm::mat4 ret1(
+		x_bottom, y_bottom, z_bottom, 0.0f,
+		p_1_length,p_2_length, p_3_length, 0.0f,
+		p_1_angle, p_2_angle, p_3_angle, 0.0f,
+		x_up, y_up, z_up, 1.0f);
+
+	return ret1;
+
+}
+
 glm::mat4 buildTMatrixFromPointVec(float pos_x, float pos_y, float pos_z, float vec_x, float vec_y, float vec_z) {
 
 	glm::vec3 n, o, vx, vy, vz;
@@ -248,6 +262,15 @@ glm::mat4 buildTMatrixFromPointVec(float pos_x, float pos_y, float pos_z, float 
 	return matFromVecs(o, vx, vy, vz);
 }
 
+
+extern "C" __declspec(dllexport) int irregularPyramid3(float x_bottom, float y_bottom, float z_bottom, float x_up, float y_up, float z_up,
+													   float p_1_length, float p_1_angle, float p_2_length, float p_2_angle, float p_3_length, float p_3_angle,
+														float r, float g, float b) {
+	//printf("Build Box\n");
+	return buildPoint(n_points, buildTMatrixFromIrregularPoint(x_bottom,y_bottom, z_bottom, x_up, y_up, z_up,
+		p_1_length, p_1_angle, p_2_length, p_2_angle, p_3_length, p_3_angle),
+		12, 3, p_1_length, glm::vec3(r, g, b));
+}
 
 extern "C" __declspec(dllexport) int building(float pos_x, float pos_y, float pos_z, float w, float l, float h, int divs, float r, float g, float b) {
 	//printf("Build Box\n");
@@ -1084,6 +1107,11 @@ extern "C" __declspec(dllexport) void cycle() {
 		glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
 		glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
 		glDrawArrays(GL_POINTS, 0, n_points);
+		glUseProgram(shaderProgram2);
+		glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
+		glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
+		glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
+		glDrawArrays(GL_POINTS, 0, n_points);
 		break;
 	case 1:
 		glUseProgram(shaderProgram1);
@@ -1112,11 +1140,7 @@ extern "C" __declspec(dllexport) void cycle() {
 		glDrawArrays(GL_POINTS, 0, n_points);
 		break;
 	}
-	glUseProgram(shaderProgram2);
-	glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-	glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
-	glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
-	glDrawArrays(GL_POINTS, 0, n_points);
+
 	/*        n_points=0;
 	city(100);
 	send_data();

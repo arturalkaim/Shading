@@ -58,6 +58,33 @@ const GLchar* geometryShaderSrc = GLSL(
 
     }
 
+	void irregularPyramid3(){
+		vec4 p0 = vec4(tMat[0][0],tMat[1][0],tMat[2][0],1.0);
+		vec4 p1 = vec4(tMat[3][0],tMat[3][1],tMat[3][2],1.0);
+		vec3 lenghts = vec3(tMat[0][1],tMat[1][1],tMat[2][1]);
+		vec3 angles = vec3(tMat[0][2],tMat[1][2],tMat[2][2]);
+
+		for (int i = 0; i < 3; i++) {
+			gl_Position = MVP * p0 + MVP * vec4(cos(angles[i]) * lenghts[i], -sin(angles[i]) * lenghts[i], 0.0, 1.0);
+			EmitVertex();
+		}
+		gl_Position = MVP * p0 + MVP * vec4(cos(angles[0]) * lenghts[0], -sin(angles[0]) * lenghts[0], 0.0, 1.0);
+		EmitVertex();
+		EndPrimitive();
+
+		for (int i = 0; i < 3; i++) {
+			gl_Position = MVP * p0 + MVP * vec4(cos(angles[i]) * lenghts[i], -sin(angles[i]) * lenghts[i], 0.0, 1.0);
+			EmitVertex();
+
+			gl_Position = MVP * p1;
+			EmitVertex();
+		}
+		gl_Position = MVP * p0 + MVP * vec4(cos(angles[0]) * lenghts[0], -sin(angles[0]) * lenghts[0], 0.0, 1.0);
+		EmitVertex();
+		EndPrimitive();
+	
+	}
+
 	void makePoint(float w0, float l0,float h){
             int texAux=0;
 			float alpha = PI/4;
@@ -606,7 +633,11 @@ const GLchar* geometryShaderSrc = GLSL(
                 makeRegSurface(1.0,1.0,int(vSides[0]));
             break;
 
-            default:
+			case 12:
+                irregularPyramid3();
+            break;
+            
+			default:
                  break;
         }
         
