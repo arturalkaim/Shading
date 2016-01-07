@@ -7,7 +7,7 @@
 
 (provide (all-defined-out))
 
-
+(define 2pi (* pi 2))
 ;;;;;; Obejects functions
 
 (define city ffi:city)
@@ -74,6 +74,41 @@
     )
   )
 
+(define (floats<-pts pts)
+  (if (null? pts)
+      (list)
+      (let ((pt (car pts)))
+        (cons (exact->inexact (xyz-x pt))
+              (cons (exact->inexact (xyz-y pt))
+                    (cons (exact->inexact (xyz-z pt))
+                          (floats<-pts (cdr pts))))))))
+
+
+(define (line pts [r 1.0] [g 1.0] [b 1.0])
+  (if
+   (> (length pts) 4)
+   (let ([args (append (list (length pts) (floats<-pts (take pts 4))) (map exact->inexact (list r g b)))])
+     (apply ffi:line args)
+     (line (drop pts 3) r g b))
+   (let ([args (append (list (length pts) (floats<-pts pts)) (map exact->inexact (list r g b)))])
+     (apply ffi:line args))
+   )
+  )
+
+(define (polygon pts [r 1.0] [g 1.0] [b 1.0])
+  (when
+      (> (length pts) 2)  (begin (ffi:triangle (floats<-pts (list (first pts) (second pts) (third pts))) r g b )    
+                                 (polygon (append (list (first pts)) (rest (rest pts))) r g b))
+    )
+  )
+
+(define (polygon-line pts [r 1.0] [g 1.0] [b 1.0])
+  (cond
+    [(> (length pts) 2)  (begin (line (list (first pts) (second pts) (third pts)))    
+                                (polygon-line (append (list (first pts)) (rest (rest pts))) r g b))]
+    [(= (length pts) 2)  (line (list (first pts) (second pts)))]
+    )
+  )
 
 (define (point p1 [r 1.0] [g 1.0] [b 1.0])
   (let* ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) 0.1 r g b))])

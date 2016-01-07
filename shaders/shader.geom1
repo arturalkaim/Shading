@@ -55,11 +55,19 @@ const GLchar* geometryShaderSrc1 = GLSL(
 
     }
 
+	void makeLine(int n){
+		for(int i = 0;i<n;i++){
+			gl_Position = MVP * vec4(tMat[i][0],tMat[i][1],tMat[i][2],1.0);
+			EmitVertex();
+		}
+		EndPrimitive();	
+	}
+
 	void irregularPyramid3(){
-		vec4 p0 = vec4(tMat[0][0],tMat[1][0],tMat[2][0],1.0);
+		vec4 p0 = vec4(tMat[0][0],tMat[0][1],tMat[0][2],1.0);
 		vec4 p1 = vec4(tMat[3][0],tMat[3][1],tMat[3][2],1.0);
-		vec3 lenghts = vec3(tMat[0][1],tMat[1][1],tMat[2][1]);
-		vec3 angles = vec3(tMat[0][2],tMat[1][2],tMat[2][2]);
+		vec3 lenghts = vec3(tMat[1][0],tMat[1][1],tMat[1][2]);
+		vec3 angles = vec3(tMat[2][0],tMat[2][1],tMat[2][2]);
 
 		for (int i = 0; i < 3; i++) {
 			gl_Position = MVP * p0 + MVP * vec4(cos(angles[i]) * lenghts[i], -sin(angles[i]) * lenghts[i], 0.0, 1.0);
@@ -93,10 +101,10 @@ const GLchar* geometryShaderSrc1 = GLSL(
                 float ang = ((PI * 2.0) / sides * i);
 				float ang1 = ((PI * 2.0) / sides * (i+1));
 
-				gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
+				gl_Position = aux + MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
                 EmitVertex();
 
-                gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
+                gl_Position = aux + MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
                 EmitVertex();
 				EndPrimitive();
             }
@@ -108,7 +116,7 @@ const GLchar* geometryShaderSrc1 = GLSL(
                 float ang = ((PI * 2.0) / sides * i);
 
                 // Offset from center of point (0.3 to accomodate for aspect ratio)
-                gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
+                gl_Position = aux + MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
                 EmitVertex();
 
             }
@@ -119,7 +127,7 @@ const GLchar* geometryShaderSrc1 = GLSL(
                 float ang = ((PI * 2.0) / sides * i);
 
                 // Offset from center of point (0.3 to accomodate for aspect ratio)
-                gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
+                gl_Position = aux + MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
                 EmitVertex();
 
             }
@@ -589,9 +597,13 @@ const GLchar* geometryShaderSrc1 = GLSL(
             break;
 
 			case 12:
-				gColor = gColor11;
+				//gColor = gColor11;
                 irregularPyramid3();
             break;
+
+			case 13:
+				makeLine(int(vSides[0]));
+
             default:
              break;
         }

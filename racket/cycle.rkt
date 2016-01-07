@@ -187,7 +187,7 @@
  "Truss"
  (lambda (n sizex sizey angle cam-z)
    (begin
-     (view (cyl 100.0 (/ angle 10) cam-z) (u0))
+     ;(view (cyl 100.0 (/ angle 10) cam-z) (u0))
      (update (list n sizex sizey))))
  '(("n" 5 50 20)
    ("sizex" 1 20 10)

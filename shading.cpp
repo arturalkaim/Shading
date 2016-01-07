@@ -113,6 +113,7 @@ int buildPoint(int n,
 	points[n*VALUES_PER_POINT + 18] = scale;
 	points[n*VALUES_PER_POINT + 19] = ratio;
 
+
 	//printMatrixV(n);
 	return n;
 }
@@ -230,6 +231,49 @@ glm::mat4 buildTMatrixFromIrregularPoint(float x_bottom, float y_bottom, float z
 
 }
 
+float scaleFromPointsList(float * pts) {
+	return pts[0] - pts[3];	
+}
+
+glm::mat4 buildTMatrixFromPointsList(int n, float * pts) {
+	glm::mat4 ret(1.0f);
+
+	int j = 0;
+	for (int i = 0; i < n && i < 4; i++) {
+		ret[i][0] = pts[j++]; ret[i][1] = pts[j++]; ret[i][2] = pts[j++];
+	}
+
+	/*
+	ret[0][0] = pts[0]; ret[0][1] = pts[1]; ret[0][2] = pts[2];
+	ret[1][0] = pts[3]; ret[1][1] = pts[4]; ret[1][2] = pts[5];
+	
+	if (n > 2) {
+		ret[2][0] = pts[6]; ret[2][1] = pts[7]; ret[2][2] = pts[8];
+	}
+	if (n > 3) {
+		ret[3][0] = pts[9]; ret[3][1] = pts[10]; ret[3][2] = pts[10];
+	}
+
+	
+
+	switch (n)
+	{
+	case 4:
+		ret[3][0] = pts[9]; ret[3][1] = pts[10]; ret[3][2] = pts[10];
+	case 3:
+		ret[2][0] = pts[6]; ret[2][1] = pts[7]; ret[2][2] = pts[8];
+	case 2:
+		ret[0][0] = pts[0]; ret[0][1] = pts[1]; ret[0][2] = pts[2];
+		ret[1][0] = pts[3]; ret[1][1] = pts[4]; ret[1][2] = pts[5];
+	default:
+		break;
+	}*/
+
+	//printf("buildTMatrixFromPointsList\n");
+	//printMatrix(ret);
+	return ret;
+}
+
 glm::mat4 buildTMatrixFromPointVec(float pos_x, float pos_y, float pos_z, float vec_x, float vec_y, float vec_z) {
 
 	glm::vec3 n, o, vx, vy, vz;
@@ -263,14 +307,7 @@ glm::mat4 buildTMatrixFromPointVec(float pos_x, float pos_y, float pos_z, float 
 }
 
 
-extern "C" __declspec(dllexport) int irregularPyramid3(float x_bottom, float y_bottom, float z_bottom, float x_up, float y_up, float z_up,
-													   float p_1_length, float p_1_angle, float p_2_length, float p_2_angle, float p_3_length, float p_3_angle,
-														float r, float g, float b) {
-	//printf("Build Box\n");
-	return buildPoint(n_points, buildTMatrixFromIrregularPoint(x_bottom,y_bottom, z_bottom, x_up, y_up, z_up,
-		p_1_length, p_1_angle, p_2_length, p_2_angle, p_3_length, p_3_angle),
-		12, 3, p_1_length, glm::vec3(r, g, b));
-}
+
 
 extern "C" __declspec(dllexport) int building(float pos_x, float pos_y, float pos_z, float w, float l, float h, int divs, float r, float g, float b) {
 	//printf("Build Box\n");
@@ -418,6 +455,25 @@ extern "C" __declspec(dllexport) int regLine(float pos_x, float pos_y, float pos
 	float sides, float w, float l, float red, float g, float b, float angle) {
 	return buildPoint(n_points, glm::scale(buildTMatrixFromPointVec(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2), glm::vec3(w, l, 0.0f)),
 		11, sides, l, glm::vec3(red, g, b), angle);
+}
+
+
+extern "C" __declspec(dllexport) int irregularPyramid3(float x_bottom, float y_bottom, float z_bottom, float x_up, float y_up, float z_up,
+	float p_1_length, float p_1_angle, float p_2_length, float p_2_angle, float p_3_length, float p_3_angle,
+	float r, float g, float b) {
+	//printf("Build Box\n");
+	return buildPoint(n_points, buildTMatrixFromIrregularPoint(x_bottom, y_bottom, z_bottom, x_up, y_up, z_up,
+		p_1_length, p_1_angle, p_2_length, p_2_angle, p_3_length, p_3_angle),
+		12, 3, p_1_length, glm::vec3(r, g, b));
+}
+
+extern "C" __declspec(dllexport) int line(int n, float *pts, float r, float g, float b) {
+	return buildPoint(n_points, buildTMatrixFromPointsList(n, pts), 13, n, scaleFromPointsList(pts), glm::vec3(r, g, b));
+}
+
+extern "C" __declspec(dllexport) int triangle(float *pts, float r, float g, float b) {
+
+	return 	buildPoint(n_points, buildTMatrixFromPointsList(3, pts), 14, 3, scaleFromPointsList(pts), glm::vec3(r, g, b));
 }
 
 extern "C" __declspec(dllexport) int setView(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2){
@@ -961,7 +1017,7 @@ extern "C" __declspec(dllexport) int init(int n) {
 	// Camera/View transformation
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	// Projection 
-	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 1000.0f);
 
 	// Create transformations
 	model = glm::mat4(1.0f);
@@ -1073,7 +1129,7 @@ extern "C" __declspec(dllexport) void cycle() {
 	
 
 	// Projection 
-	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 100.0f);
+	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 1000.0f);
 	//       posLookAt = glm::vec3(0.0f);
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	//view = glm::lookAt(cameraPos, posLookAt, cameraUp);

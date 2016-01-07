@@ -57,12 +57,18 @@ const GLchar* geometryShaderSrc = GLSL(
         EndPrimitive();
 
     }
-
+	void makeTriangle(){
+		for(int i = 0;i<3;i++){
+			gl_Position = MVP * vec4(tMat[i][0],tMat[i][1],tMat[i][2],1.0);
+			EmitVertex();
+		}
+		EndPrimitive();			
+	}
 	void irregularPyramid3(){
-		vec4 p0 = vec4(tMat[0][0],tMat[1][0],tMat[2][0],1.0);
+		vec4 p0 = vec4(tMat[0][0],tMat[0][1],tMat[0][2],1.0);
 		vec4 p1 = vec4(tMat[3][0],tMat[3][1],tMat[3][2],1.0);
-		vec3 lenghts = vec3(tMat[0][1],tMat[1][1],tMat[2][1]);
-		vec3 angles = vec3(tMat[0][2],tMat[1][2],tMat[2][2]);
+		vec3 lenghts = vec3(tMat[1][0],tMat[1][1],tMat[1][2]);
+		vec3 angles = vec3(tMat[2][0],tMat[2][1],tMat[2][2]);
 
 		for (int i = 0; i < 3; i++) {
 			gl_Position = MVP * p0 + MVP * vec4(cos(angles[i]) * lenghts[i], -sin(angles[i]) * lenghts[i], 0.0, 1.0);
@@ -97,11 +103,11 @@ const GLchar* geometryShaderSrc = GLSL(
                 float ang = ((PI * 2.0) / sides * i);
 
 				gColor = gColorAux * vec4(vec3((sin(ang)+1)*0.4+0.2),1.0);
-				gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
+				gl_Position = aux + MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
                 EmitVertex();
 
                 //gColor = gColorAux;
-                gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
+                gl_Position = aux + MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
                 EmitVertex();
 
             }
@@ -113,13 +119,13 @@ const GLchar* geometryShaderSrc = GLSL(
                 // Angle between each side in radians
                 float ang = ((PI * 2.0) / sides * i);
                 if(i%2==(sides%2)){
-                    gl_Position = aux + MVP *  vec4(0.0f,0.0f,-h,1.0f);
+                    gl_Position = aux + MVP * tMat * vec4(0.0f,0.0f,-h,1.0f);
                     EmitVertex();
                 }
 
                 //gColor = vec4(1.0,0.5,0.0,1.0);
                 // Offset from center of point (0.3 to accomodate for aspect ratio)
-                gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
+                gl_Position = aux + MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
                 EmitVertex();
 
             }
@@ -130,12 +136,12 @@ const GLchar* geometryShaderSrc = GLSL(
                 // Angle between each side in radians
                 float ang = ((PI * 2.0) / sides * i);
                 if(i%2==(sides%2)){
-                    gl_Position = aux + MVP *  vec4(0.0f,0.0f,h,1.0f);
+                    gl_Position = aux + MVP * tMat * vec4(0.0f,0.0f,h,1.0f);
                     EmitVertex();
                 }
                 //gColor = vec4(topColor,topColor,topColor,1.0);
                 // Offset from center of point (0.3 to accomodate for aspect ratio)
-                gl_Position = aux + MVP *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
+                gl_Position = aux + MVP * tMat * vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
                 EmitVertex();
 
             }
@@ -636,6 +642,9 @@ const GLchar* geometryShaderSrc = GLSL(
 			case 12:
                 irregularPyramid3();
             break;
+
+			case 14:
+				makeTriangle();
             
 			default:
                  break;

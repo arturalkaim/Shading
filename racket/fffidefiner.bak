@@ -79,7 +79,5 @@
 (defffi "int setView(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2)")
 (defffi "int rotate(int n, float angle, float vx, float vy, float vz)")
 
-(provide line)
-(define-f-function line (_fun _int (_list i _float) _float _float _float -> _int) #:c-id line)
-(provide triangle)
-(define-f-function triangle (_fun (_list i _float) _float _float _float -> _int) #:c-id triangle)
+
+(define-f-function add-polyline (_fun (closed? : _bool) (n : _int) (vs : (_list i _float)) -> _actor-ptr) #:c-id addPolyline)
