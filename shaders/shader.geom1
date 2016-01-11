@@ -54,7 +54,14 @@ const GLchar* geometryShaderSrc1 = GLSL(
         EndPrimitive();
 
     }
-
+	
+	void makeTriangle(){
+		for(int i = 0;i<3;i++){
+			gl_Position = MVP * vec4(tMat[i][0],tMat[i][1],tMat[i][2],1.0);
+			EmitVertex();
+		}
+		EndPrimitive();			
+	}
 	void makeLine(int n){
 		for(int i = 0;i<n;i++){
 			gl_Position = MVP * vec4(tMat[i][0],tMat[i][1],tMat[i][2],1.0);
@@ -603,7 +610,9 @@ const GLchar* geometryShaderSrc1 = GLSL(
 
 			case 13:
 				makeLine(int(vSides[0]));
-
+			
+			case 14:
+				makeTriangle();
             default:
              break;
         }

@@ -17,6 +17,7 @@
       #t))
 
 (define box ffi:box)
+
 (define (cylinder p1 radius p2 [r 1.0] [g 1.0] [b 1.0])
   (let* ([comp (distance p1 p2)]
          [args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) radius radius comp 20.0 r g b))])
@@ -68,6 +69,13 @@
     )
   )
 
+(define (irregularPyramid p1 p2 l1 a1 l2 a2 l3 a3 [r 1.0] [g 1.0] [b 1.0])
+  (let ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) l1 a1 l2 a2 l3 a3 r g b))])
+    (apply ffi:irregularPyramid3 args)
+    )
+  )
+
+
 (define (irregularPyramid3 p1 p2 l1 a1 l2 a2 l3 a3 [r 1.0] [g 1.0] [b 1.0])
   (let ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) (cx p2) (cy p2) (cz p2) l1 a1 l2 a2 l3 a3 r g b))])
     (apply ffi:irregularPyramid3 args)
@@ -83,41 +91,69 @@
                     (cons (exact->inexact (xyz-z pt))
                           (floats<-pts (cdr pts))))))))
 
-
 (define (line pts [r 1.0] [g 1.0] [b 1.0])
   (if
-   (> (length pts) 4)
-   (let ([args (append (list (length pts) (floats<-pts (take pts 4))) (map exact->inexact (list r g b)))])
-     (apply ffi:line args)
-     (line (drop pts 3) r g b))
-   (let ([args (append (list (length pts) (floats<-pts pts)) (map exact->inexact (list r g b)))])
-     (apply ffi:line args))
-   )
-  )
+   (> (length pts) 4) 
+   (let* ([args (append (list 4 (floats<-pts (take pts 4))) (map exact->inexact (list r g b)))])
+     (cons (apply ffi:line args) (line (drop pts 3) r g b)))
+   (let* ([args (append (list (length pts) (floats<-pts pts)) (map exact->inexact (list r g b)))])
+     (list (apply ffi:line args)))))
 
 (define (polygon pts [r 1.0] [g 1.0] [b 1.0])
-  (when
-      (> (length pts) 2)  (begin (ffi:triangle (floats<-pts (list (first pts) (second pts) (third pts))) r g b )    
-                                 (polygon (append (list (first pts)) (rest (rest pts))) r g b))
-    )
-  )
+  (if (> (length pts) 3)
+      (cons (ffi:triangle (floats<-pts (list (first pts) (second pts) (third pts))) r g b ) (polygon (append (list (first pts)) (rest (rest pts))) r g b))
+      (list (ffi:triangle (floats<-pts (list (first pts) (second pts) (third pts))) r g b ))))
+
+
+
+#;(define (line pts [r 1.0] [g 1.0] [b 1.0])
+    (define result (list))
+    (let aux ((pts pts))
+      (if
+       (> (length pts) 4)
+       (let* ([args (append (list 4 (floats<-pts (take pts 4))) (map exact->inexact (list r g b)))]
+              [id (apply ffi:line args)])
+         (set! result (cons id result))
+         (aux (drop pts 3)))   
+       (let* ([args (append (list (length pts) (floats<-pts pts)) (map exact->inexact (list r g b)))]
+              [id (apply ffi:line args)])
+         (set! result (cons id result)))
+       )
+      )
+    result)
+
+
+
+
+#;(define (polygon pts [r 1.0] [g 1.0] [b 1.0])
+    (define result (list))
+    (let aux ((pts pts))
+      (when (> (length pts) 2)
+        (let ([id (ffi:triangle (floats<-pts (list (first pts) (second pts) (third pts))) r g b )])   
+          (set! result (cons id result))
+          (aux (append (list (first pts)) (rest (rest pts)))))))
+    result)
 
 (define (polygon-line pts [r 1.0] [g 1.0] [b 1.0])
   (cond
-    [(> (length pts) 2)  (begin (line (list (first pts) (second pts) (third pts)))    
+    [(> (length pts) 2)  (begin (line (list (first pts) (second pts) (third pts)))
                                 (polygon-line (append (list (first pts)) (rest (rest pts))) r g b))]
     [(= (length pts) 2)  (line (list (first pts) (second pts)))]
     )
   )
 
 (define (point p1 [r 1.0] [g 1.0] [b 1.0])
-  (let* ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) 0.1 r g b))])
+  (let* ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) 0.5 r g b))])
     (apply ffi:point args)
     )
   #;(let* ([args (map exact->inexact (list (cx p1) (cy p1) (cz p1) 1.5 1.5 1.5 r g b 0.0 0.0 0.0 0.0))])
       (apply ffi:box args)
       )
   )
+
+(define (mirror shapes pt vec)
+  (append (for/list ([shape (flatten shapes)])
+            (ffi:mirror shape (floats<-pts (list pt)) (floats<-pts (list vec))))(flatten shapes) ))
 
 ;;;;;;;;;;;;;;;;;;;;; Transformations         ;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
@@ -232,6 +268,9 @@
 (define cz xyz-z)
 
 (define (u0) (xyz 0.0 0.0 0.0))
+(define (ux) (xyz 1.0 0.0 0.0))
+(define (uy) (xyz 0.0 1.0 0.0))
+(define (uz) (xyz 0.0 0.0 1.0))
 ;(provide +xyz +xy -xy x+ y+ z+ +xz)
 (define (+xyz p x y z)
   (xyz (+ (cx p) x) (+ (cy p) y) (+ (cz p) z)))

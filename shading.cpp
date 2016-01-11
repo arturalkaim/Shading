@@ -57,12 +57,16 @@ void printMatrix(glm::mat4 mat) {
 	printf("%s\n", glm::to_string(mat).c_str());
 }
 
+void printMatrix(glm::mat3 mat) {
+	printf("%s\n", glm::to_string(mat).c_str());
+}
+
 void printVec(glm::vec3 vec) {
 	printf("%s\n", glm::to_string(vec).c_str());
 }
 
 void printMatrixV(int n) {
-	for (int i = 0; i<16; i++) {
+	for (int i = 0; i < 16; i++) {
 		printf("%f ", points[n*VALUES_PER_POINT + i]);
 		if (i % 4 == 3)
 			printf("\n");
@@ -83,7 +87,7 @@ glm::mat4 cleanColor(glm::mat4 mat) {
 }
 
 int buildPoint(int n,
-	glm::mat4 mat, float type, float n_sides, float scale,glm::vec3 color, float ratio = 1.0) {
+	glm::mat4 mat, float type, float n_sides, float scale, glm::vec3 color, float ratio = 1.0) {
 
 	n_points++;
 	//printMatrix(mat);
@@ -166,7 +170,7 @@ glm::mat4 matFromVecs(glm::vec3 o, glm::vec3 vx, glm::vec3 vy, glm::vec3 vz) {
 		vz.x, vz.y, vz.z, 0.0f,
 		o.x, o.y, o.z, 1.0f);
 	//printf("matFromVecs:\n");
-	
+
 	//printMatrix(ret);
 
 	//printf("transpose matFromVecs:\n");
@@ -183,22 +187,22 @@ glm::mat4 matFromVecs(glm::vec3 o, glm::vec3 vx, glm::vec3 vy, glm::vec3 vz) {
 }
 
 glm::vec3 vpol(float rho, float phi) {
-	return glm::vec3(rho * cos(phi), rho * sin(phi),0.0f);
+	return glm::vec3(rho * cos(phi), rho * sin(phi), 0.0f);
 }
 
 glm::mat4 buildTMatrixFromPoints(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2) {
 
 	glm::vec3 n, o, vx, vy, vz;
 	n = glm::vec3(pos_x_2, pos_y_2, pos_z_2) - glm::vec3(pos_x, pos_y, pos_z);
-	o = glm::vec3(pos_x + pos_x_2, pos_y + pos_y_2, pos_z + pos_z_2)/ 2.0f;
+	o = glm::vec3(pos_x + pos_x_2, pos_y + pos_y_2, pos_z + pos_z_2) / 2.0f;
 	//glm::vec3(pos_x, pos_y, pos_z); //
-	
-	vx = vpol(1.0f, glm::atan(n.y, n.x) - (PI/2.0));
+
+	vx = vpol(1.0f, glm::atan(n.y, n.x) - (PI / 2.0));
 	//if (vx.x < 0 || vx.y < 0 || vx.z < 0)
 	//	vx = -vx;
 	vy = glm::normalize(glm::cross(n, vx));
 	vz = glm::normalize(n);
-	
+
 	/*
 	(define (cs-from-o-vz [o : Loc] [n : Vec])
 	  (let ((o (loc-in-world o))
@@ -207,7 +211,7 @@ glm::mat4 buildTMatrixFromPoints(float pos_x, float pos_y, float pos_z, float po
 		  (let ((vy (unitize (v*v n vx))))
 			(let ((vz (unitize n)))
 			  (cs-from-o-vx-vy-vz o vx vy vz))))))
-		 
+
 	printf("Vecs x:\n");
 	printVec(vx);
 	printf("Vecs y:\n");
@@ -215,15 +219,15 @@ glm::mat4 buildTMatrixFromPoints(float pos_x, float pos_y, float pos_z, float po
 	printf("Vecs z:\n");
 	printVec(vz); */
 
-	return matFromVecs(o,vx,vy,vz);
+	return matFromVecs(o, vx, vy, vz);
 }
 
 glm::mat4 buildTMatrixFromIrregularPoint(float x_bottom, float y_bottom, float z_bottom, float x_up, float y_up, float z_up,
 	float p_1_length, float p_1_angle, float p_2_length, float p_2_angle, float p_3_length, float p_3_angle) {
-	
+
 	glm::mat4 ret1(
 		x_bottom, y_bottom, z_bottom, 0.0f,
-		p_1_length,p_2_length, p_3_length, 0.0f,
+		p_1_length, p_2_length, p_3_length, 0.0f,
 		p_1_angle, p_2_angle, p_3_angle, 0.0f,
 		x_up, y_up, z_up, 1.0f);
 
@@ -231,8 +235,66 @@ glm::mat4 buildTMatrixFromIrregularPoint(float x_bottom, float y_bottom, float z
 
 }
 
+
+float getType(int n) {
+	return points[n*VALUES_PER_POINT + 16];
+}
+
+float getSides(int n) {
+	return points[n*VALUES_PER_POINT + 17];
+}
+
+float getScale(int n) {
+	return 	points[n*VALUES_PER_POINT + 18];
+}
+
+glm::vec3 getColor(int n) {
+	return glm::vec3(points[n*VALUES_PER_POINT + 3], points[n*VALUES_PER_POINT + 7], points[n*VALUES_PER_POINT + 11]);
+}
+
+
+
+glm::mat4 buildMirroredMatrixOf(int n, float * pt, float * vec) {
+	float x = pt[0], y = pt[1], z = pt[2];
+	float a = vec[0], b = vec[1], c = vec[2];
+
+	float d = -a*x - b*y - c*z;
+	glm::mat4 mat2(-2 * a*a + 1, -2 * b*a, -2 * c*a, 0,
+		-2 * a*b, -2 * b*b + 1, -2 * c*b, 0,
+		-2 * a*c, -2 * b*c, -2 * c*c + 1, 0,
+		-2 * a*d, -2 * b*d, -2 * c*d, 1);
+
+	if (getType(n) < 12) {
+
+		glm::mat4 mat1(points[n*VALUES_PER_POINT + 0], points[n*VALUES_PER_POINT + 1], points[n*VALUES_PER_POINT + 2], 0.0f,
+			points[n*VALUES_PER_POINT + 4], points[n*VALUES_PER_POINT + 5], points[n*VALUES_PER_POINT + 6], 0.0f,
+			points[n*VALUES_PER_POINT + 8], points[n*VALUES_PER_POINT + 9], points[n*VALUES_PER_POINT + 10], 0.0f,
+			points[n*VALUES_PER_POINT + 12], points[n*VALUES_PER_POINT + 13], points[n*VALUES_PER_POINT + 14], 1.0f);
+
+		return mat2 * mat1;
+	}
+	else if (getType(n) > 11) {
+
+		glm::vec4 v1(points[n*VALUES_PER_POINT + 0], points[n*VALUES_PER_POINT + 1], points[n*VALUES_PER_POINT + 2], 1.0f);
+		glm::vec4 v2(points[n*VALUES_PER_POINT + 4], points[n*VALUES_PER_POINT + 5], points[n*VALUES_PER_POINT + 6], 1.0f);
+		glm::vec4 v3(points[n*VALUES_PER_POINT + 8], points[n*VALUES_PER_POINT + 9], points[n*VALUES_PER_POINT + 10], 1.0f);
+		glm::vec4 v4(points[n*VALUES_PER_POINT + 12], points[n*VALUES_PER_POINT + 13], points[n*VALUES_PER_POINT + 14], 1.0f);
+
+
+		glm::mat4 mat1(mat2 * v1, mat2 * v2, mat2 * v3, mat2 * v4);
+		/*printMatrix(mat1);
+		printMatrix(mat2);
+		printMatrix(mat1 * mat2);
+		printMatrix(mat2 * mat1);*/
+		return mat1;
+	}
+
+
+}
+
+
 float scaleFromPointsList(float * pts) {
-	return pts[0] - pts[3];	
+	return pts[0] - pts[3];
 }
 
 glm::mat4 buildTMatrixFromPointsList(int n, float * pts) {
@@ -243,34 +305,6 @@ glm::mat4 buildTMatrixFromPointsList(int n, float * pts) {
 		ret[i][0] = pts[j++]; ret[i][1] = pts[j++]; ret[i][2] = pts[j++];
 	}
 
-	/*
-	ret[0][0] = pts[0]; ret[0][1] = pts[1]; ret[0][2] = pts[2];
-	ret[1][0] = pts[3]; ret[1][1] = pts[4]; ret[1][2] = pts[5];
-	
-	if (n > 2) {
-		ret[2][0] = pts[6]; ret[2][1] = pts[7]; ret[2][2] = pts[8];
-	}
-	if (n > 3) {
-		ret[3][0] = pts[9]; ret[3][1] = pts[10]; ret[3][2] = pts[10];
-	}
-
-	
-
-	switch (n)
-	{
-	case 4:
-		ret[3][0] = pts[9]; ret[3][1] = pts[10]; ret[3][2] = pts[10];
-	case 3:
-		ret[2][0] = pts[6]; ret[2][1] = pts[7]; ret[2][2] = pts[8];
-	case 2:
-		ret[0][0] = pts[0]; ret[0][1] = pts[1]; ret[0][2] = pts[2];
-		ret[1][0] = pts[3]; ret[1][1] = pts[4]; ret[1][2] = pts[5];
-	default:
-		break;
-	}*/
-
-	//printf("buildTMatrixFromPointsList\n");
-	//printMatrix(ret);
 	return ret;
 }
 
@@ -358,7 +392,7 @@ extern "C" __declspec(dllexport) int prismpts(float pos_x, float pos_y, float po
 extern "C" __declspec(dllexport) int trunkpts(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float l, float w, float h, float w1, float h1, float sides, float red, float g, float b) {
 	//printf("Build Cylinder\n");
 	return buildPoint(n_points, glm::scale(buildTMatrixFromPoints(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2), glm::vec3(l, w, h)),
-		9, sides, w, glm::vec3(red, g, b),w/w1);
+		9, sides, w, glm::vec3(red, g, b), w / w1);
 }
 
 extern "C" __declspec(dllexport) int cylinder(float pos_x, float pos_y, float pos_z, float r, float h, float red, float g, float b, float angle, float vx, float vy, float vz) {
@@ -445,10 +479,10 @@ extern "C" __declspec(dllexport) int sphere(float pos_x, float pos_y, float pos_
 }
 
 extern "C" __declspec(dllexport) int regSurface(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2,
-											float sides, float w, float l, float red, float g, float b, float angle) {
+	float sides, float w, float l, float red, float g, float b, float angle) {
 	//printf("Build Cylinder\n");  glm::scale(buildTMatrixFromPoints(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2)
 	return buildPoint(n_points, glm::scale(buildTMatrixFromPointVec(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2), glm::vec3(w, l, 0.0f)),
-		10, sides, l, glm::vec3(red, g, b),angle);
+		10, sides, l, glm::vec3(red, g, b), angle);
 }
 
 extern "C" __declspec(dllexport) int regLine(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2,
@@ -476,7 +510,12 @@ extern "C" __declspec(dllexport) int triangle(float *pts, float r, float g, floa
 	return 	buildPoint(n_points, buildTMatrixFromPointsList(3, pts), 14, 3, scaleFromPointsList(pts), glm::vec3(r, g, b));
 }
 
-extern "C" __declspec(dllexport) int setView(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2){
+extern "C" __declspec(dllexport) int mirror(int n, float *pt, float *vec) {
+
+	return buildPoint(n_points, buildMirroredMatrixOf(n, pt, vec), getType(n), getSides(n), getScale(n), getColor(n));
+}
+
+extern "C" __declspec(dllexport) int setView(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2) {
 
 	cameraPos = glm::vec3(pos_x, pos_y, pos_z);
 	cameraUp = glm::vec3(0.0f, 0.0f, 1.0f);
@@ -501,20 +540,20 @@ extern "C" __declspec(dllexport) int rotate(int n,
 	glm::mat4 mat1 = glm::mat4(points[n*VALUES_PER_POINT + 0], points[n*VALUES_PER_POINT + 1], points[n*VALUES_PER_POINT + 2], 0.0f,
 		points[n*VALUES_PER_POINT + 4], points[n*VALUES_PER_POINT + 5], points[n*VALUES_PER_POINT + 6], 0.0f,
 		points[n*VALUES_PER_POINT + 8], points[n*VALUES_PER_POINT + 9], points[n*VALUES_PER_POINT + 10], 0.0f,
-		points[n*VALUES_PER_POINT + 12], points[n*VALUES_PER_POINT + 13], points[n*VALUES_PER_POINT + 14], 0.0f);
+		points[n*VALUES_PER_POINT + 12], points[n*VALUES_PER_POINT + 13], points[n*VALUES_PER_POINT + 14], 1.0f);
 
 	glm::mat4 res = glm::rotate(mat1, angle, glm::vec3(vx / v_length, vy / v_length, vz / v_length));
 
 	printMatrix(res);
 
-	points[n*VALUES_PER_POINT+0]=res[0][0];points[n*VALUES_PER_POINT+1]=res[0][1];points[n*VALUES_PER_POINT+2]=res[0][2];//points[n*VALUES_PER_POINT+3]=res[0][3];
-	points[n*VALUES_PER_POINT+4]=res[1][0];points[n*VALUES_PER_POINT+5]=res[1][1];points[n*VALUES_PER_POINT+6]=res[1][2];//points[n*VALUES_PER_POINT+7]=res[1][3];
-	points[n*VALUES_PER_POINT+8]=res[2][0];points[n*VALUES_PER_POINT+9]=res[2][1];points[n*VALUES_PER_POINT+10]=res[2][2];//points[n*VALUES_PER_POINT+11]=res[2][3];
-	points[n*VALUES_PER_POINT+12]=res[3][0];points[n*VALUES_PER_POINT+13]=res[3][1];points[n*VALUES_PER_POINT+14]=res[3][2];//points[n*VALUES_PER_POINT+15]=res[3][3];
+	points[n*VALUES_PER_POINT + 0] = res[0][0]; points[n*VALUES_PER_POINT + 1] = res[0][1]; points[n*VALUES_PER_POINT + 2] = res[0][2];//points[n*VALUES_PER_POINT+3]=res[0][3];
+	points[n*VALUES_PER_POINT + 4] = res[1][0]; points[n*VALUES_PER_POINT + 5] = res[1][1]; points[n*VALUES_PER_POINT + 6] = res[1][2];//points[n*VALUES_PER_POINT+7]=res[1][3];
+	points[n*VALUES_PER_POINT + 8] = res[2][0]; points[n*VALUES_PER_POINT + 9] = res[2][1]; points[n*VALUES_PER_POINT + 10] = res[2][2];//points[n*VALUES_PER_POINT+11]=res[2][3];
+	points[n*VALUES_PER_POINT + 12] = res[3][0]; points[n*VALUES_PER_POINT + 13] = res[3][1]; points[n*VALUES_PER_POINT + 14] = res[3][2];//points[n*VALUES_PER_POINT+15]=res[3][3];
 
 	//memcpy(points+n*VALUES_PER_POINT*sizeof(float),glm::value_ptr(res),16*sizeof(float));
 
-	printf("ROTATE %f• (%f,%f,%f)\n",angle,vx/v_length,vy/v_length,vz/v_length);
+	printf("ROTATE %f• (%f,%f,%f)\n", angle, vx / v_length, vy / v_length, vz / v_length);
 	printMatrixV(n);
 
 	return n;
@@ -613,12 +652,12 @@ void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 	if (fov >= 45.0f)
 		fov = 45.0f;
 		*/
-	
+
 	if (std::abs(xoffset) < std::abs(yoffset))
 		cameraPos += ((GLfloat)yoffset * 0.1f) * cameraUp;
 	else
 		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * ((GLfloat)yoffset) * 40.0f;
-	
+
 }
 int shaderid = 0;
 // Is called whenever a key is pressed/released via GLFW
@@ -869,7 +908,7 @@ GLint modelLoc, viewLoc, projLoc;
 
 extern "C" __declspec(dllexport) int clean() {
 	vecSize = 10;
-	points = (float *)calloc(sizeof(float), VALUES_PER_POINT*10);
+	points = (float *)calloc(sizeof(float), VALUES_PER_POINT * 10);
 	n_points = 0;
 	return 0;
 }
@@ -877,7 +916,7 @@ extern "C" __declspec(dllexport) int clean() {
 extern "C" __declspec(dllexport) int init(int n) {
 	vecSize = n;
 	points = (float *)calloc(sizeof(float), VALUES_PER_POINT*n);
-	
+
 
 	glfwInit();
 
@@ -922,7 +961,7 @@ extern "C" __declspec(dllexport) int init(int n) {
 	glDepthFunc(GL_LEQUAL);                                // The Type Of Depth Testing To Do
 
 	glm::vec3 cameraPos = glm::vec3(0.0f, 70.0f, 30.0f);
-														   // Compile and activate shaders
+	// Compile and activate shaders
 	GLuint vertexShader = createShader(GL_VERTEX_SHADER, vertexShaderSrc);
 
 	GLuint geometryShader = createShader(GL_GEOMETRY_SHADER, geometryShaderSrc);
@@ -934,7 +973,7 @@ extern "C" __declspec(dllexport) int init(int n) {
 	GLuint tessEvalShader = createShader(GL_TESS_EVALUATION_SHADER, tesselationEvalShaderSrc);
 	GLuint tessCtrlShader = createShader(GL_TESS_CONTROL_SHADER, tesselationCtrlShaderSrc);
 
-	
+
 	shaderProgram = glCreateProgram();
 	shaderProgram1 = glCreateProgram();
 	shaderProgram2 = glCreateProgram();
@@ -1126,7 +1165,7 @@ extern "C" __declspec(dllexport) void cycle() {
 	// Clear the colorbuffer
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	
+
 
 	// Projection 
 	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 1000.0f);
@@ -1257,7 +1296,7 @@ extern "C" __declspec(dllexport) int start() {
 			glfwSetWindowShouldClose(window, GL_TRUE);
 
 		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-			shaderid = shaderid++%3;
+			shaderid = shaderid++ % 3;
 
 
 		if (shaderid == 0)
@@ -1369,7 +1408,7 @@ extern "C" __declspec(dllexport) void city(int size) {
 	{
 		for (int j = -2 * size; j < 2 * size; j += 8)
 		{
-			if (std::abs(i)<forestSize * 3 + 4 && std::abs(j)<forestSize + 4)
+			if (std::abs(i) < forestSize * 3 + 4 && std::abs(j) < forestSize + 4)
 				continue;
 			NUMBER_OF_BUILDINGS++;
 
@@ -1394,13 +1433,13 @@ void forest(int size) {
 			h = 0.3 + fmax(fmax(gaussiana2d(i - 10, j, 25.2), gaussiana2d(i + 50, j - 20, 18.2)), gaussiana2d(i - 70, j + 10, 15.2));
 			//h *= 3;
 			//h = std::abs(glm::simplex(glm::vec2(i / 16.f, j / 16.f)));
-			if (h<0.45)
+			if (h < 0.45)
 			{
-				if (h>0.4)
+				if (h > 0.4)
 				{
 					boxv(i + glm::linearRand(-2, 2), j, 0.15f, 2.2f, 5.2f, 0.1f, GREY);
-					if (h>0.4 && h<0.43)
-						boxv(i + glm::linearRand(-2, 2), j, 0.0f, 0.2f, 0.2f, 2.0f, glm::linearRand(0, 1)<1 ? RED : BLUE);
+					if (h > 0.4 && h < 0.43)
+						boxv(i + glm::linearRand(-2, 2), j, 0.0f, 0.2f, 0.2f, 2.0f, glm::linearRand(0, 1) < 1 ? RED : BLUE);
 				}
 			}
 			else
@@ -1485,7 +1524,7 @@ extern "C" __declspec(dllexport) int main() {
 
 	send_data();
 	printf("TEST %d\n", TestCycle++);
-	while (end_cycle()<0) {
+	while (end_cycle() < 0) {
 		pool();
 		cycle();
 		//showFPS();

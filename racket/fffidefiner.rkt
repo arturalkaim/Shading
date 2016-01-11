@@ -78,6 +78,9 @@
 
 (defffi "int setView(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2)")
 (defffi "int rotate(int n, float angle, float vx, float vy, float vz)")
+(provide mirror)
+(define-f-function mirror (_fun _int (_list i _float) (_list i _float) -> _int) #:c-id mirror)
+
 
 (provide line)
 (define-f-function line (_fun _int (_list i _float) _float _float _float -> _int) #:c-id line)
