@@ -196,8 +196,9 @@ glm::mat4 buildTMatrixFromPoints(float pos_x, float pos_y, float pos_z, float po
 	n = glm::vec3(pos_x_2, pos_y_2, pos_z_2) - glm::vec3(pos_x, pos_y, pos_z);
 	o = glm::vec3(pos_x + pos_x_2, pos_y + pos_y_2, pos_z + pos_z_2) / 2.0f;
 	//glm::vec3(pos_x, pos_y, pos_z); //
-
-	vx = vpol(1.0f, glm::atan(n.y, n.x) - (PI / 2.0));
+	printf("Vecs o:\n");
+	printVec(o);
+	vx = vpol(1.0f, glm::atan(n.y, n.x) + (PI / 2.0f));
 	//if (vx.x < 0 || vx.y < 0 || vx.z < 0)
 	//	vx = -vx;
 	vy = glm::normalize(glm::cross(n, vx));
@@ -211,13 +212,14 @@ glm::mat4 buildTMatrixFromPoints(float pos_x, float pos_y, float pos_z, float po
 		  (let ((vy (unitize (v*v n vx))))
 			(let ((vz (unitize n)))
 			  (cs-from-o-vx-vy-vz o vx vy vz))))))
+			  */
 
 	printf("Vecs x:\n");
 	printVec(vx);
 	printf("Vecs y:\n");
 	printVec(vy);
 	printf("Vecs z:\n");
-	printVec(vz); */
+	printVec(vz);
 
 	return matFromVecs(o, vx, vy, vz);
 }

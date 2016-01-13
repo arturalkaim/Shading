@@ -156,7 +156,7 @@ const GLchar* geometryShaderSrc = GLSL(
             vec4 gColorAux = gColor;
             for (int i = 0; i <= sides; i++,texAux+=8) {
                 // Angle between each side in radians
-                float ang = ((PI * 2.0) / sides * i);
+                float ang = ((PI * 2.0) / sides * i) + (PI / 4);
 
 
                 //gColor = vec4((sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,1.0);
@@ -178,7 +178,7 @@ const GLchar* geometryShaderSrc = GLSL(
             // Safe, GLfloats can represent small integers exactly
             for (int i = 0; i <= sides; i++) {
                 // Angle between each side in radians
-                float ang = ((PI * 2.0) / sides * i);
+                float ang = ((PI * 2.0) / sides * i) + (PI / 4);
                 if(i%2==(sides%2)){
                     gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,-h,1.0f);
                     vTex = vec2(i/sides,0.0);
@@ -197,7 +197,7 @@ const GLchar* geometryShaderSrc = GLSL(
             // Safe, GLfloats can represent small integers exactly
             for (int i = 0; i <= sides; i++) {
                 // Angle between each side in radians
-                float ang = ((PI * 2.0) / sides * i);
+                float ang = ((PI * 2.0) / sides * i) + (PI / 4);
                 if(i%2==(sides%2)){
                     gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,h,1.0f);
                     vTex = vec2(i/sides,1.0);
@@ -225,7 +225,7 @@ const GLchar* geometryShaderSrc = GLSL(
 				float l1 = l * ratio;
                 for (int i = 0; i <= sides; i++,texAux+=8) {
                     // Angle between each side in radians
-                    float ang = ((PI * 2.0) / sides * i);
+                    float ang = ((PI * 2.0) / sides * i) + (PI / 4);
 
 
                     //gColor = vec4((sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,(sin(ang/15)+1)*0.5,1.0);
@@ -247,7 +247,7 @@ const GLchar* geometryShaderSrc = GLSL(
                 // Safe, GLfloats can represent small integers exactly
                 for (int i = 0; i <= sides; i++) {
                     // Angle between each side in radians
-                    float ang = ((PI * 2.0) / sides * i);
+                    float ang = ((PI * 2.0) / sides * i) + (PI / 4);
                     if(i%2==(sides%2)){
                         gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,-h,1.0f);
                         vTex = vec2(i/sides,0.0);
@@ -266,7 +266,7 @@ const GLchar* geometryShaderSrc = GLSL(
                 // Safe, GLfloats can represent small integers exactly
                 for (int i = 0; i <= sides; i++) {
                     // Angle between each side in radians
-                    float ang = ((PI * 2.0) / sides * i);
+                    float ang = ((PI * 2.0) / sides * i) + (PI / 4);
                     if(i%2==(sides%2)){
                         gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,h,1.0f);
                         vTex = vec2(i/sides,1.0);
@@ -287,7 +287,7 @@ const GLchar* geometryShaderSrc = GLSL(
                     // Safe, GLfloats can represent small integers exactly
                     for (int i = 0; i <= sides; i++) {
                         // Angle between each side in radians
-                        float ang = ((PI * 2.0) / sides * i);
+                        float ang = ((PI * 2.0) / sides * i) + (PI / 4);
                         //float ang = (PI * 2.0) / vSides[0] * i;
                         //ang -= vTime[0];
                         //if(i%2==0)
@@ -313,7 +313,7 @@ const GLchar* geometryShaderSrc = GLSL(
                     // Safe, GLfloats can represent small integers exactly
                     for (int i = 0; i <= sides; i++) {
                         // Angle between each side in radians
-                        float ang = ((PI * 2.0) / sides * i);
+                        float ang = ((PI * 2.0) / sides * i) + (PI / 4);
                         if(i%2==(sides%2)){
                             gl_Position = aux + MVP * tMat * vec4(0.0f,0.0f,-h,1.0f);
                             EmitVertex();

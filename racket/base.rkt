@@ -104,8 +104,6 @@
       (cons (ffi:triangle (floats<-pts (list (first pts) (second pts) (third pts))) r g b ) (polygon (append (list (first pts)) (rest (rest pts))) r g b))
       (list (ffi:triangle (floats<-pts (list (first pts) (second pts) (third pts))) r g b ))))
 
-
-
 #;(define (line pts [r 1.0] [g 1.0] [b 1.0])
     (define result (list))
     (let aux ((pts pts))
