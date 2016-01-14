@@ -1,13 +1,12 @@
 #lang racket
-(require
-  (prefix-in p3d: pict3d))
+(require rosetta)
 
 (require (prefix-in ffi: "fffidefiner.rkt"))
 ;(provide (all-from-out "fffidefiner.rkt"))
 
 (provide (all-defined-out))
 
-(define 2pi (* pi 2))
+;(define 2pi (* pi 2))
 ;;;;;; Obejects functions
 
 (define city ffi:city)
@@ -86,7 +85,7 @@
   (if (null? pts)
       (list)
       (let ((pt (car pts)))
-        (cons (exact->inexact (xyz-x pt))
+        (cons (exact->inexact (cx pt))
               (cons (exact->inexact (xyz-y pt))
                     (cons (exact->inexact (xyz-z pt))
                           (floats<-pts (cdr pts))))))))
@@ -251,24 +250,7 @@
       (* x (/ (aleatorio) 2147483647.0))
       (remainder (aleatorio) x)))
 
-(provide pic-list)
-(define pic-list '())
 
-
-(provide xyz xy xyz? u0)
-(struct xyz (x y z) #:mutable #:transparent)
-(define (xy x y) (xyz x y 0.0))
-(define (xz x z) (xyz x 0.0 z))
-(define (yz y z) (xyz 0.0 y z))
-(provide cx cy cz)
-(define cx xyz-x)
-(define cy xyz-y)
-(define cz xyz-z)
-
-(define (u0) (xyz 0.0 0.0 0.0))
-(define (ux) (xyz 1.0 0.0 0.0))
-(define (uy) (xyz 0.0 1.0 0.0))
-(define (uz) (xyz 0.0 0.0 1.0))
 ;(provide +xyz +xy -xy x+ y+ z+ +xz)
 (define (+xyz p x y z)
   (xyz (+ (cx p) x) (+ (cy p) y) (+ (cz p) z)))
@@ -323,18 +305,18 @@
 
 
 (provide pos->xyz xyz->pos xyz->dir pos->dir distance mid-point norm-c dir->xyz)
-(define (pos->xyz p)
+#;(define (pos->xyz p)
   (xyz (p3d:pos-x p) (p3d:pos-y p) (p3d:pos-z p)))
-(define (xyz->pos p)
+#;(define (xyz->pos p)
   (p3d:pos (cx p) (cy p) (cz p)))
-(define (xyz->dir p)
+#;(define (xyz->dir p)
   (p3d:dir (cx p) (cy p) (cz p)))
-(define (pos->dir p)
+#;(define (pos->dir p)
   (p3d:dir (p3d:pos-x p) (p3d:pos-y p) (p3d:pos-z p)))
 (define (distance p1 p2)
-  (p3d:pos-dist (xyz->pos p1) (xyz->pos p2)))
-(define (mid-point p1 p2)
-  (p3d:pos-between (xyz->pos p1) (xyz->pos p2) 1/2))
+  (-c p1 p2))
+(define (mid-point p1 p2) null)
+  ;(p3d:pos-between (xyz->pos p1) (xyz->pos p2) 1/2))
 (define (norm-c p1)
   (let* ((pw  (p3d:dir-normalize (xyz->dir p1)))
          (p (if (not (p3d:dir? pw)) (p3d:dir 0.0 0.0 0.0) pw)))
