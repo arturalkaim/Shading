@@ -12,8 +12,10 @@
 #include <iostream>
 #include <sstream>      // std::ostringstream
 
+//#include "main.h"
 #include "shaders.h"
 #include "camera.h"
+#include "poly2tri.h"
 //#include "main.h"
 
 const float PI = 3.1415926;
@@ -345,7 +347,6 @@ glm::mat4 buildTMatrixFromPointVec(float pos_x, float pos_y, float pos_z, float 
 
 
 
-
 extern "C" __declspec(dllexport) int building(float pos_x, float pos_y, float pos_z, float w, float l, float h, int divs, float r, float g, float b) {
 	//printf("Build Box\n");
 	return buildPoint(n_points, glm::scale(glm::translate(glm::mat4(), glm::vec3(pos_x, pos_y, pos_z)), glm::vec3(w, l, h)),
@@ -508,9 +509,33 @@ extern "C" __declspec(dllexport) int line(int n, float *pts, float r, float g, f
 	return buildPoint(n_points, buildTMatrixFromPointsList(n, pts), 13, n, scaleFromPointsList(pts), glm::vec3(r, g, b));
 }
 
+
 extern "C" __declspec(dllexport) int triangle(float *pts, float r, float g, float b) {
 
 	return 	buildPoint(n_points, buildTMatrixFromPointsList(3, pts), 14, 3, scaleFromPointsList(pts), glm::vec3(r, g, b));
+}
+
+void triangulate(int n, float *pts, float r, float g, float b) {
+	std::vector<p2t::Point*> polyline;
+
+	for (int i = 0; i < n; i += 3)
+	{
+		polyline.push_back(new p2t::Point(pts[i], pts[i + 1]));
+	}
+
+	p2t::CDT* cdt = new p2t::CDT(polyline);
+	cdt->Triangulate();
+	std::vector<p2t::Triangle*> a = cdt->GetTriangles();
+	for each (p2t::Triangle* var in a)
+	{
+		float tpoints[] = { var->GetPoint(0)->x, var->GetPoint(0)->y, var->GetPoint(1)->x, var->GetPoint(1)->y, var->GetPoint(2)->y, var->GetPoint(2)->y };
+		triangle(tpoints, r, g, b);
+	}
+
+}
+
+extern "C" __declspec(dllexport) void Polygon(int n, float *pts, float r, float g, float b) {
+	triangulate(n, pts, r, g, b);
 }
 
 extern "C" __declspec(dllexport) int mirror(int n, float *pt, float *vec) {
@@ -666,6 +691,11 @@ int shaderid = 0;
 // Is called whenever a key is pressed/released via GLFW
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
+	if (action == GLFW_PRESS)
+		pressed = GL_TRUE;
+	else if (action == GLFW_RELEASE)
+		pressed = GL_FALSE;
+
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	if (key >= 0 && key < 1024)
@@ -692,9 +722,11 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		pressed = GL_TRUE;
+		savePos();
 		glfwGetCursorPos(window, &xpos_1, &ypos_1);
 	}
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		computeMatricesFromInputs();
 		pressed = GL_FALSE;
 	}
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
@@ -1171,7 +1203,8 @@ extern "C" __declspec(dllexport) void cycle() {
 
 
 	// Projection 
-	computeMatricesFromInputs();
+	if(pressed)
+		computeMatricesFromInputs();
 	projection = getProjectionMatrix(); // glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 1000.0f);
 	//       posLookAt = glm::vec3(0.0f);
 	view = getViewMatrix(); //glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
