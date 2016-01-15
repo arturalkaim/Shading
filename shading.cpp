@@ -13,6 +13,7 @@
 #include <sstream>      // std::ostringstream
 
 #include "shaders.h"
+#include "camera.h"
 //#include "main.h"
 
 const float PI = 3.1415926;
@@ -1170,9 +1171,10 @@ extern "C" __declspec(dllexport) void cycle() {
 
 
 	// Projection 
-	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 1000.0f);
+	computeMatricesFromInputs();
+	projection = getProjectionMatrix(); // glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 1000.0f);
 	//       posLookAt = glm::vec3(0.0f);
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	view = getViewMatrix(); //glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	//view = glm::lookAt(cameraPos, posLookAt, cameraUp);
 	//view = glm::lookAt(glm::vec3(camX, camY, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));//        model = glm::mat4(1.0f);
 	//view = glm::mat4(1.0f);
