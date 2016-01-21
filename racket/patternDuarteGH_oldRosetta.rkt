@@ -210,7 +210,7 @@
      p (uy))
     p (ux))))
 
-(itera-quads pattern (map-division (lambda (i j)
+(time (itera-quads pattern (map-division (lambda (i j)
                                      (xyz i j 0))
-                                   -10 10 16
-                                   -10 10 8))
+                                   -10 10 14
+                                   -10 10 7)))
