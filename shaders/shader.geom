@@ -91,11 +91,14 @@ const GLchar* geometryShaderSrc = GLSL(
 	
 	}
 
-	void makePoint(float w0, float l0,float h){
+	void makePoint(float w0, float l0,float h0){
             int texAux=0;
+			float dist = 1.0;
+			//distance(aux,vec4(cameraPos,1.0))/80.0;
 			float alpha = PI/4;
-			float width = w0/cos(alpha);
-			float l = l0/cos(alpha);
+			float h = h0 * dist;
+			float width = w0/(cos(alpha))*dist;
+			float l = l0/(cos(alpha))*dist;
 			int sides = 4;
             vec4 gColorAux = gColor;
             for (int i = 0; i <= sides; i++,texAux+=8) {

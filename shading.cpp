@@ -12,7 +12,11 @@
 #include <iostream>
 #include <sstream>      // std::ostringstream
 
+//#include "main.h"
+#include "TrackballControls.h"
 #include "shaders.h"
+#include "camera.h"
+#include "poly2tri.h"
 //#include "main.h"
 
 const float PI = 3.1415926;
@@ -66,6 +70,7 @@ void printVec(glm::vec3 vec) {
 }
 
 void printMatrixV(int n) {
+	printf("\n");
 	for (int i = 0; i < 16; i++) {
 		printf("%f ", points[n*VALUES_PER_POINT + i]);
 		if (i % 4 == 3)
@@ -100,7 +105,7 @@ int buildPoint(int n,
 		printf("TEST %d  :  %d\n", vecSize, n_points);
 	}
 
-	//printMatrix(mat);
+	printMatrix(mat);
 
 	memcpy(points + n*VALUES_PER_POINT, glm::value_ptr(mat), 16 * sizeof(float));
 
@@ -213,7 +218,6 @@ glm::mat4 buildTMatrixFromPoints(float pos_x, float pos_y, float pos_z, float po
 			(let ((vz (unitize n)))
 			  (cs-from-o-vx-vy-vz o vx vy vz))))))
 			  */
-
 	printf("Vecs x:\n");
 	printVec(vx);
 	printf("Vecs y:\n");
@@ -237,6 +241,18 @@ glm::mat4 buildTMatrixFromIrregularPoint(float x_bottom, float y_bottom, float z
 
 }
 
+glm::mat4 listToMat4(float *trs) {
+	return glm::mat4(
+	glm::vec4(trs[0], trs[4], trs[8], trs[12]),
+	glm::vec4(trs[1], trs[5], trs[9], trs[13]),
+	glm::vec4(trs[2], trs[6], trs[10], trs[14]),
+	glm::vec4(trs[3], trs[7], trs[11], trs[15]));
+	/*return glm::mat4(
+		glm::vec4(trs[0], trs[4], trs[8], trs[12]),
+		glm::vec4(trs[1], trs[5], trs[9], trs[13]),
+		glm::vec4(trs[2], trs[6], trs[10], trs[14]),
+		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));*/	
+}
 
 float getType(int n) {
 	return points[n*VALUES_PER_POINT + 16];
@@ -303,10 +319,10 @@ glm::mat4 buildTMatrixFromPointsList(int n, float * pts) {
 	glm::mat4 ret(1.0f);
 
 	int j = 0;
-	for (int i = 0; i < n && i < 4; i++) {
-		ret[i][0] = pts[j++]; ret[i][1] = pts[j++]; ret[i][2] = pts[j++];
+	for (int i = 0; i < n; i++) {
+			ret[i][0] = pts[j++]; ret[i][1] = pts[j++]; ret[i][2] = pts[j++];
+			//printf("id:%d (x:%f y:%f z:%f)\n",i ,pts[i*3], pts[(i * 3) + 1], pts[(i * 3) + 2]);
 	}
-
 	return ret;
 }
 
@@ -341,7 +357,6 @@ glm::mat4 buildTMatrixFromPointVec(float pos_x, float pos_y, float pos_z, float 
 
 	return matFromVecs(o, vx, vy, vz);
 }
-
 
 
 
@@ -483,13 +498,13 @@ extern "C" __declspec(dllexport) int sphere(float pos_x, float pos_y, float pos_
 extern "C" __declspec(dllexport) int regSurface(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2,
 	float sides, float w, float l, float red, float g, float b, float angle) {
 	//printf("Build Cylinder\n");  glm::scale(buildTMatrixFromPoints(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2)
-	return buildPoint(n_points, glm::scale(buildTMatrixFromPointVec(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2), glm::vec3(w, l, 0.0f)),
+	return buildPoint(n_points, glm::scale(buildTMatrixFromPointVec(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2), glm::vec3(w, l, 1.0f)),
 		10, sides, l, glm::vec3(red, g, b), angle);
 }
 
 extern "C" __declspec(dllexport) int regLine(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2,
 	float sides, float w, float l, float red, float g, float b, float angle) {
-	return buildPoint(n_points, glm::scale(buildTMatrixFromPointVec(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2), glm::vec3(w, l, 0.0f)),
+	return buildPoint(n_points, glm::scale(buildTMatrixFromPointVec(pos_x, pos_y, pos_z, pos_x_2, pos_y_2, pos_z_2), glm::vec3(w, l, 1.0f)),
 		11, sides, l, glm::vec3(red, g, b), angle);
 }
 
@@ -507,9 +522,33 @@ extern "C" __declspec(dllexport) int line(int n, float *pts, float r, float g, f
 	return buildPoint(n_points, buildTMatrixFromPointsList(n, pts), 13, n, scaleFromPointsList(pts), glm::vec3(r, g, b));
 }
 
+
 extern "C" __declspec(dllexport) int triangle(float *pts, float r, float g, float b) {
 
 	return 	buildPoint(n_points, buildTMatrixFromPointsList(3, pts), 14, 3, scaleFromPointsList(pts), glm::vec3(r, g, b));
+}
+
+void triangulate(int n, float *pts, float r, float g, float b) {
+	std::vector<p2t::Point*> polyline;
+
+	for (int i = 0; i < n; i += 3)
+	{
+		polyline.push_back(new p2t::Point(pts[i], pts[i + 1]));
+	}
+
+	p2t::CDT* cdt = new p2t::CDT(polyline);
+	cdt->Triangulate();
+	std::vector<p2t::Triangle*> a = cdt->GetTriangles();
+	for each (p2t::Triangle* var in a)
+	{
+		float tpoints[] = { var->GetPoint(0)->x, var->GetPoint(0)->y, var->GetPoint(1)->x, var->GetPoint(1)->y, var->GetPoint(2)->y, var->GetPoint(2)->y };
+		triangle(tpoints, r, g, b);
+	}
+
+}
+
+extern "C" __declspec(dllexport) void Polygon(int n, float *pts, float r, float g, float b) {
+	triangulate(n, pts, r, g, b);
 }
 
 extern "C" __declspec(dllexport) int mirror(int n, float *pt, float *vec) {
@@ -612,6 +651,38 @@ extern "C" __declspec(dllexport) int scale(int n,
 	return n;
 }
 
+extern "C" __declspec(dllexport) int transform(int n, float* trs) {
+
+	if (points[n*VALUES_PER_POINT + 16] == 5)
+	{
+		transform(n + 1, trs);
+		transform(n + 2, trs);
+	}
+
+	glm::vec4 color(points[n*VALUES_PER_POINT + 3], points[n*VALUES_PER_POINT + 7], points[n*VALUES_PER_POINT + 11], points[n*VALUES_PER_POINT + 15]);
+
+	glm::mat4 mat1 = glm::mat4(points[n*VALUES_PER_POINT + 0], points[n*VALUES_PER_POINT + 1], points[n*VALUES_PER_POINT + 2], 0.0f,
+		points[n*VALUES_PER_POINT + 4], points[n*VALUES_PER_POINT + 5], points[n*VALUES_PER_POINT + 6], 0.0f,
+		points[n*VALUES_PER_POINT + 8], points[n*VALUES_PER_POINT + 9], points[n*VALUES_PER_POINT + 10], 0.0f,
+		points[n*VALUES_PER_POINT + 12], points[n*VALUES_PER_POINT + 13], points[n*VALUES_PER_POINT + 14], 1.0f);
+
+	printMatrix(mat1);
+	glm::mat4 tr_mat = listToMat4(trs);
+	printMatrix(tr_mat);
+	glm::mat4 res = tr_mat * mat1;
+	printMatrix(res);
+
+
+
+	memcpy(points + n*VALUES_PER_POINT, glm::value_ptr(res), 16 * sizeof(float));
+	//memcpy(points + n*VALUES_PER_POINT, glm::value_ptr(mat), 16 * sizeof(float));
+	points[n*VALUES_PER_POINT + 3] = color[0];
+	points[n*VALUES_PER_POINT + 7] = color[1];
+	points[n*VALUES_PER_POINT + 11] = color[2];
+	//printMatrixV(n);
+	return n;
+}
+
 
 // The following is an 8x8 checkerboard pattern using // GL_RED, GL_UNSIGNED_BYTE data.
 static const GLubyte tex_checkerboard_data[] =
@@ -665,6 +736,11 @@ int shaderid = 0;
 // Is called whenever a key is pressed/released via GLFW
 void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
 {
+	if (action == GLFW_PRESS)
+		pressed = GL_TRUE;
+	else if (action == GLFW_RELEASE)
+		pressed = GL_FALSE;
+
 	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 	if (key >= 0 && key < 1024)
@@ -691,9 +767,11 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		pressed = GL_TRUE;
+		savePos();
 		glfwGetCursorPos(window, &xpos_1, &ypos_1);
 	}
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
+		computeMatricesFromInputs();
 		pressed = GL_FALSE;
 	}
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
@@ -907,6 +985,10 @@ GLFWwindow* window;
 GLuint shaderProgram, shaderProgram1, shaderProgram2;
 glm::mat4 model, view, projection;
 GLint modelLoc, viewLoc, projLoc;
+sasmaster::Camera3D tCam(glm::vec3(0.0f, 0.0f, 100.0f));
+//Init trackball instance :
+sasmaster::TrackballControls* tball;
+
 
 extern "C" __declspec(dllexport) int clean() {
 	vecSize = 10;
@@ -916,6 +998,7 @@ extern "C" __declspec(dllexport) int clean() {
 }
 
 extern "C" __declspec(dllexport) int init(int n) {
+	using namespace sasmaster;
 	vecSize = n;
 	points = (float *)calloc(sizeof(float), VALUES_PER_POINT*n);
 
@@ -928,7 +1011,7 @@ extern "C" __declspec(dllexport) int init(int n) {
 	glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
 	glfwWindowHint(GLFW_DOUBLEBUFFER, GL_TRUE);
 	glfwWindowHint(GLFW_RESIZABLE, GL_TRUE);
-	glfwWindowHint(GL_DEPTH_BITS, 49);
+	glfwWindowHint(GL_DEPTH_BITS, 50);
 	glfwWindowHint(GLFW_SAMPLES, 16);
 	glfwWindowHint(GLFW_STICKY_KEYS, GL_TRUE);
 
@@ -943,7 +1026,7 @@ extern "C" __declspec(dllexport) int init(int n) {
 	// Set the required callback functions
 	glfwSetKeyCallback(window, key_callback);
 	glfwSetScrollCallback(window, scroll_callback);
-	//glfwSetCursorPosCallback(window, mouse_callback);
+	glfwSetCursorPosCallback(window, mouse_callback);
 	glfwSetMouseButtonCallback(window, mouse_button_callback);
 	// GLFW Options
 	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
@@ -1054,6 +1137,12 @@ extern "C" __declspec(dllexport) int init(int n) {
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 1, GL_FLOAT, GL_FALSE, VALUES_PER_POINT * sizeof(GLfloat), (void*)(19 * sizeof(GLfloat)));
 
+	//init camera object:
+	//tCam = Camera3D(glm::vec3(0.0f, 0.0f, 100.0f));
+	//Init trackball instance :
+	tball = &TrackballControls::GetInstance(&tCam, glm::vec4(0.0f, 0.0f, width, height));
+	//Init GLFW callbacks:
+	tball->Init(window);
 
 	// Camera/View transformation
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -1147,7 +1236,7 @@ extern "C" __declspec(dllexport) void cycle() {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
 	//        if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS){
-
+	tball->Update();
 	/*if ( cycle_n++ == -10 ){
 	cycle_n = 0;
 	n_points = 0;
@@ -1170,15 +1259,16 @@ extern "C" __declspec(dllexport) void cycle() {
 
 
 	// Projection 
-	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 1000.0f);
+	//if(pressed) computeMatricesFromInputs();
+	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.001f, 1000.0f); // getProjectionMatrix(); //
 	//       posLookAt = glm::vec3(0.0f);
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp); //getViewMatrix(); //
 	//view = glm::lookAt(cameraPos, posLookAt, cameraUp);
 	//view = glm::lookAt(glm::vec3(camX, camY, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));//        model = glm::mat4(1.0f);
 	//view = glm::mat4(1.0f);
 	//projection = glm::mat4(1.0f);
 
-
+	view = tCam.m_viewMatr;
 
 	GLint camPos = glGetUniformLocation(shaderProgram, "cameraPos");
 	GLint lookPos = glGetUniformLocation(shaderProgram, "lookat");

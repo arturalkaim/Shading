@@ -237,7 +237,7 @@
       null
       )))
 
-
+(time
 (begin (itera-quads pattern (map-division (lambda (i j)
                                      (xyz i j 0))
                                    -30 30 16
@@ -245,7 +245,7 @@
        (displayln 0))
 
 
-(time
+
  (begin
    (send_data)
    (thread while)))

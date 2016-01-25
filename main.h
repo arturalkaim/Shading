@@ -33,6 +33,8 @@ extern "C" int spherev(float pos_x, float pos_y, float pos_z, float r, glm::vec3
 
 extern "C" int sphere(float pos_x, float pos_y, float pos_z, float r, float red, float g, float b);
 
+extern "C" int triangle(float *pts, float r, float g, float b);
+
 extern "C" int regSurface(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float sides, float w, float l, float red, float g, float b, float angle);
 
 extern "C" int regLine(float pos_x, float pos_y, float pos_z, float pos_x_2, float pos_y_2, float pos_z_2, float sides, float w, float l, float red, float g, float b, float angle);
