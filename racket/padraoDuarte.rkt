@@ -1,8 +1,5 @@
 #lang racket
-(require
-  "base.rkt"
-  "sliders.rkt"
-  (prefix-in p3d: pict3d))
+(require rosetta/glfast)
 
 
 (init 100)
@@ -178,21 +175,21 @@
       
       (mirror
        (mirror (list
-                (polygon (list p p13 p23 p22 p21 p) 0.0 0.5 0.0)
+                (polygon-surface (list p p13 p23 p22 p21 p) 0.0 0.5 0.0)
                 ;(point p)
                 
-                (polygon (list p21 p31 p22 p11 p21) 0.82 0.82 0.0)
-                (polygon (list p22 p32 p23 p12 p22) 0.82 0.82 0.0)
-                (polygon (list p23 p33 p13 p23) 0.82 0.82 0.0)
+                (polygon-surface (list p21 p31 p22 p11 p21) 0.82 0.82 0.0)
+                (polygon-surface (list p22 p32 p23 p12 p22) 0.82 0.82 0.0)
+                (polygon-surface (list p23 p33 p13 p23) 0.82 0.82 0.0)
                 ;Big-star-middle
                 #;(with-current-layer "midd-out"
                                       (union
                                        (surface (list (line p31 p41 p51 p61 p52 p42 p31)))
                                        (surface (list (line p32 p43 p52 p62 p53 p44 p32)))
                                        (surface (list (line p33 p45 p53 p63 p33)))))
-                (polygon (list p31 p41 p51 p61 p52 p42 p31)  0.0 0.0 1.0)
-                (polygon (list p32 p43 p52 p62 p53 p44 p32) 0.0 0.0 1.0)
-                (polygon (list p33 p45 p53 p63 p33) 0.0 0.0 1.0)
+                (polygon-surface (list p31 p41 p51 p61 p52 p42 p31)  0.0 0.0 1.0)
+                (polygon-surface (list p32 p43 p52 p62 p53 p44 p32) 0.0 0.0 1.0)
+                (polygon-surface (list p33 p45 p53 p63 p33) 0.0 0.0 1.0)
                 ;Big-star-points
                 #;(with-current-layer "points"
                                       (union
@@ -202,9 +199,9 @@
                 ;(line (list p51 p71 p61 p51))
                 ;(line (list p52 p61 p72 p62 p52))
                 ;(line (list p53 p62 p73 p63 p53))
-                (polygon (list p51 p71 p61 p51) 0.0 0.94 0.94)
-                (polygon (list p52 p61 p72 p62 p52) 0.0 0.94 0.94)
-                (polygon (list p53 p62 p73 p63 p53) 0.0 0.94 0.94)
+                (polygon-surface (list p51 p71 p61 p51) 0.0 0.94 0.94)
+                (polygon-surface (list p52 p61 p72 p62 p52) 0.0 0.94 0.94)
+                (polygon-surface (list p53 p62 p73 p63 p53) 0.0 0.94 0.94)
                 ;Small-star
                 #;(with-current-layer "int2" (surface (list (line p3 pa1 pb1 pa2 pb2 pa3 p3))))
                 #;(with-current-layer "midd2"
@@ -212,27 +209,27 @@
                                        (surface (list (line pa1 pb1 pc1 pa1)))
                                        (surface (list (line pa2 pb1 pc2 pb2 pa2)))
                                        (surface (list (line pa3 pb2 pc3 pa3)))))
-                (polygon (list pa1 pb1 pc1 pa1) 0.0 1.0 0.0)
-                (polygon (list pa2 pb1 pc2 pb2 pa2) 0.0 1.0 0.0)
-                (polygon (list pa3 pb2 pc3 pa3) 0.0 1.0 0.0)
+                (polygon-surface (list pa1 pb1 pc1 pa1) 0.0 1.0 0.0)
+                (polygon-surface (list pa2 pb1 pc2 pb2 pa2) 0.0 1.0 0.0)
+                (polygon-surface (list pa3 pb2 pc3 pa3) 0.0 1.0 0.0)
                 ;small-star-middle
                 #;(with-current-layer "midd-out2"
                                       (union
                                        (surface (list (line pc1 pd1 pe1 pf1 pc1)))
                                        (surface (list (line pc2 pd2 pe1 pf2 pe2 pd3 pc2)))
                                        (surface (list (line pc3 pd4 pe2 pf3 pc3)))))
-                (polygon (list pc1 pd1 pe1 pf1 pc1)  1.0 0.0 0.0)
-                (polygon (list pc2 pd2 pe1 pf2 pe2 pd3 pc2)  1.0 0.0 0.0)
-                (polygon (list pc3 pd4 pe2 pf3 pc3) 1.0 0.0 0.0)
+                (polygon-surface (list pc1 pd1 pe1 pf1 pc1)  1.0 0.0 0.0)
+                (polygon-surface (list pc2 pd2 pe1 pf2 pe2 pd3 pc2)  1.0 0.0 0.0)
+                (polygon-surface (list pc3 pd4 pe2 pf3 pc3) 1.0 0.0 0.0)
                 ;small-star-points
                 #;(with-current-layer "points2"
                                       (union
                                        (surface (list (line pf1 pg1 pf2 pe1 pf1)))
                                        (surface (list (line pf2 pg2 pf3 pe2 pf2)))))
-                (polygon (list pf1 pg1 pf2 pe1 pf1) 1.0 0.59 0.19)
-                (polygon (list pf2 pg2 pf3 pe2 pf2) 1.0 0.59 0.19)
+                (polygon-surface (list pf1 pg1 pf2 pe1 pf1) 1.0 0.59 0.19)
+                (polygon-surface (list pf2 pg2 pf3 pe2 pf2) 1.0 0.59 0.19)
                 ;triangle
-                (polygon (list pt1 pt2 pt3 pt1) 0.847 0.568 0.937)
+                (polygon-surface (list pt1 pt2 pt3 pt1) 0.847 0.568 0.937)
                 ) p (uy)) p (ux))
       null
       )))
