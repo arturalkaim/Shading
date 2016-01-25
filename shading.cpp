@@ -13,6 +13,7 @@
 #include <sstream>      // std::ostringstream
 
 //#include "main.h"
+#include "TrackballControls.h"
 #include "shaders.h"
 #include "camera.h"
 #include "poly2tri.h"
@@ -242,10 +243,15 @@ glm::mat4 buildTMatrixFromIrregularPoint(float x_bottom, float y_bottom, float z
 
 glm::mat4 listToMat4(float *trs) {
 	return glm::mat4(
+	glm::vec4(trs[0], trs[4], trs[8], trs[12]),
+	glm::vec4(trs[1], trs[5], trs[9], trs[13]),
+	glm::vec4(trs[2], trs[6], trs[10], trs[14]),
+	glm::vec4(trs[3], trs[7], trs[11], trs[15]));
+	/*return glm::mat4(
 		glm::vec4(trs[0], trs[4], trs[8], trs[12]),
 		glm::vec4(trs[1], trs[5], trs[9], trs[13]),
 		glm::vec4(trs[2], trs[6], trs[10], trs[14]),
-		glm::vec4(0.0, 0.0, 0.0, trs[15]));
+		glm::vec4(0.0f, 0.0f, 0.0f, 1.0f));*/	
 }
 
 float getType(int n) {
@@ -315,9 +321,8 @@ glm::mat4 buildTMatrixFromPointsList(int n, float * pts) {
 	int j = 0;
 	for (int i = 0; i < n; i++) {
 			ret[i][0] = pts[j++]; ret[i][1] = pts[j++]; ret[i][2] = pts[j++];
-			printf("id:%d (x:%f y:%f z:%f)\n",i ,pts[i*3], pts[(i * 3) + 1], pts[(i * 3) + 2]);
+			//printf("id:%d (x:%f y:%f z:%f)\n",i ,pts[i*3], pts[(i * 3) + 1], pts[(i * 3) + 2]);
 	}
-
 	return ret;
 }
 
@@ -654,6 +659,7 @@ extern "C" __declspec(dllexport) int transform(int n, float* trs) {
 		transform(n + 2, trs);
 	}
 
+	glm::vec4 color(points[n*VALUES_PER_POINT + 3], points[n*VALUES_PER_POINT + 7], points[n*VALUES_PER_POINT + 11], points[n*VALUES_PER_POINT + 15]);
 
 	glm::mat4 mat1 = glm::mat4(points[n*VALUES_PER_POINT + 0], points[n*VALUES_PER_POINT + 1], points[n*VALUES_PER_POINT + 2], 0.0f,
 		points[n*VALUES_PER_POINT + 4], points[n*VALUES_PER_POINT + 5], points[n*VALUES_PER_POINT + 6], 0.0f,
@@ -663,12 +669,16 @@ extern "C" __declspec(dllexport) int transform(int n, float* trs) {
 	printMatrix(mat1);
 	glm::mat4 tr_mat = listToMat4(trs);
 	printMatrix(tr_mat);
-	glm::mat4 res = mat1 * tr_mat;
+	glm::mat4 res = tr_mat * mat1;
 	printMatrix(res);
+
+
 
 	memcpy(points + n*VALUES_PER_POINT, glm::value_ptr(res), 16 * sizeof(float));
 	//memcpy(points + n*VALUES_PER_POINT, glm::value_ptr(mat), 16 * sizeof(float));
-
+	points[n*VALUES_PER_POINT + 3] = color[0];
+	points[n*VALUES_PER_POINT + 7] = color[1];
+	points[n*VALUES_PER_POINT + 11] = color[2];
 	//printMatrixV(n);
 	return n;
 }
@@ -975,6 +985,10 @@ GLFWwindow* window;
 GLuint shaderProgram, shaderProgram1, shaderProgram2;
 glm::mat4 model, view, projection;
 GLint modelLoc, viewLoc, projLoc;
+sasmaster::Camera3D tCam(glm::vec3(0.0f, 0.0f, 100.0f));
+//Init trackball instance :
+sasmaster::TrackballControls* tball;
+
 
 extern "C" __declspec(dllexport) int clean() {
 	vecSize = 10;
@@ -984,6 +998,7 @@ extern "C" __declspec(dllexport) int clean() {
 }
 
 extern "C" __declspec(dllexport) int init(int n) {
+	using namespace sasmaster;
 	vecSize = n;
 	points = (float *)calloc(sizeof(float), VALUES_PER_POINT*n);
 
@@ -1122,6 +1137,12 @@ extern "C" __declspec(dllexport) int init(int n) {
 	glEnableVertexAttribArray(posAttrib);
 	glVertexAttribPointer(posAttrib, 1, GL_FLOAT, GL_FALSE, VALUES_PER_POINT * sizeof(GLfloat), (void*)(19 * sizeof(GLfloat)));
 
+	//init camera object:
+	//tCam = Camera3D(glm::vec3(0.0f, 0.0f, 100.0f));
+	//Init trackball instance :
+	tball = &TrackballControls::GetInstance(&tCam, glm::vec4(0.0f, 0.0f, width, height));
+	//Init GLFW callbacks:
+	tball->Init(window);
 
 	// Camera/View transformation
 	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
@@ -1215,7 +1236,7 @@ extern "C" __declspec(dllexport) void cycle() {
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
 	//        if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS){
-
+	tball->Update();
 	/*if ( cycle_n++ == -10 ){
 	cycle_n = 0;
 	n_points = 0;
@@ -1241,13 +1262,13 @@ extern "C" __declspec(dllexport) void cycle() {
 	//if(pressed) computeMatricesFromInputs();
 	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.001f, 1000.0f); // getProjectionMatrix(); //
 	//       posLookAt = glm::vec3(0.0f);
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp); //getViewMatrix(); //
+	//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp); //getViewMatrix(); //
 	//view = glm::lookAt(cameraPos, posLookAt, cameraUp);
 	//view = glm::lookAt(glm::vec3(camX, camY, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));//        model = glm::mat4(1.0f);
 	//view = glm::mat4(1.0f);
 	//projection = glm::mat4(1.0f);
 
-
+	view = tCam.m_viewMatr;
 
 	GLint camPos = glGetUniformLocation(shaderProgram, "cameraPos");
 	GLint lookPos = glGetUniformLocation(shaderProgram, "lookat");
