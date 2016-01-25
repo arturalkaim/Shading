@@ -15,7 +15,6 @@
 //#include "main.h"
 #include "TrackballControls.h"
 #include "shaders.h"
-#include "camera.h"
 #include "poly2tri.h"
 //#include "main.h"
 
@@ -321,7 +320,6 @@ glm::mat4 buildTMatrixFromPointsList(int n, float * pts) {
 	int j = 0;
 	for (int i = 0; i < n; i++) {
 			ret[i][0] = pts[j++]; ret[i][1] = pts[j++]; ret[i][2] = pts[j++];
-			//printf("id:%d (x:%f y:%f z:%f)\n",i ,pts[i*3], pts[(i * 3) + 1], pts[(i * 3) + 2]);
 	}
 	return ret;
 }
@@ -519,6 +517,7 @@ extern "C" __declspec(dllexport) int irregularPyramid3(float x_bottom, float y_b
 }
 
 extern "C" __declspec(dllexport) int line(int n, float *pts, float r, float g, float b) {
+	printf("List n: %d\n", n);
 	return buildPoint(n_points, buildTMatrixFromPointsList(n, pts), 13, n, scaleFromPointsList(pts), glm::vec3(r, g, b));
 }
 
@@ -767,11 +766,9 @@ void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
 
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
 		pressed = GL_TRUE;
-		savePos();
 		glfwGetCursorPos(window, &xpos_1, &ypos_1);
 	}
 	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-		computeMatricesFromInputs();
 		pressed = GL_FALSE;
 	}
 	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
