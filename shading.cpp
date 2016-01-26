@@ -1283,7 +1283,7 @@ extern "C" __declspec(dllexport) void cycle() {
 	//        glEnable(GL_LINE_SMOOTH);
 	//        glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
-	switch (shaderid)
+	switch (tball->shaderid)
 	{
 	case 0:
 		glUseProgram(shaderProgram);
