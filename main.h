@@ -60,5 +60,3 @@ extern "C" int end_cycle();
 extern "C" void pool();
 
 extern "C" void cycle();
-
-extern "C" __declspec(dllexport) int start();

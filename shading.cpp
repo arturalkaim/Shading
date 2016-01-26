@@ -584,17 +584,17 @@ extern "C" __declspec(dllexport) int rotate(int n,
 
 	glm::mat4 res = glm::rotate(mat1, angle, glm::vec3(vx / v_length, vy / v_length, vz / v_length));
 
-	printMatrix(res);
+	//printMatrix(res);
 
 	points[n*VALUES_PER_POINT + 0] = res[0][0]; points[n*VALUES_PER_POINT + 1] = res[0][1]; points[n*VALUES_PER_POINT + 2] = res[0][2];//points[n*VALUES_PER_POINT+3]=res[0][3];
 	points[n*VALUES_PER_POINT + 4] = res[1][0]; points[n*VALUES_PER_POINT + 5] = res[1][1]; points[n*VALUES_PER_POINT + 6] = res[1][2];//points[n*VALUES_PER_POINT+7]=res[1][3];
 	points[n*VALUES_PER_POINT + 8] = res[2][0]; points[n*VALUES_PER_POINT + 9] = res[2][1]; points[n*VALUES_PER_POINT + 10] = res[2][2];//points[n*VALUES_PER_POINT+11]=res[2][3];
 	points[n*VALUES_PER_POINT + 12] = res[3][0]; points[n*VALUES_PER_POINT + 13] = res[3][1]; points[n*VALUES_PER_POINT + 14] = res[3][2];//points[n*VALUES_PER_POINT+15]=res[3][3];
 
-	//memcpy(points+n*VALUES_PER_POINT*sizeof(float),glm::value_ptr(res),16*sizeof(float));
+	memcpy(points+n*VALUES_PER_POINT*sizeof(float),glm::value_ptr(res),16*sizeof(float));
 
-	printf("ROTATE %f• (%f,%f,%f)\n", angle, vx / v_length, vy / v_length, vz / v_length);
-	printMatrixV(n);
+	//printf("ROTATE %f• (%f,%f,%f)\n", angle, vx / v_length, vy / v_length, vz / v_length);
+	//printMatrixV(n);
 
 	return n;
 }
@@ -609,21 +609,21 @@ extern "C" __declspec(dllexport) int move(int n,
 	}
 
 
-	glm::mat4 mat1 = glm::mat4(
-		points[n*VALUES_PER_POINT + 0], points[n*VALUES_PER_POINT + 1], points[n*VALUES_PER_POINT + 2], points[n*VALUES_PER_POINT + 3],
-		points[n*VALUES_PER_POINT + 4], points[n*VALUES_PER_POINT + 5], points[n*VALUES_PER_POINT + 6], points[n*VALUES_PER_POINT + 7],
-		points[n*VALUES_PER_POINT + 8], points[n*VALUES_PER_POINT + 9], points[n*VALUES_PER_POINT + 10], points[n*VALUES_PER_POINT + 11],
-		points[n*VALUES_PER_POINT + 12], points[n*VALUES_PER_POINT + 13], points[n*VALUES_PER_POINT + 14], points[n*VALUES_PER_POINT + 15]);
+	glm::vec4 color(points[n*VALUES_PER_POINT + 3], points[n*VALUES_PER_POINT + 7], points[n*VALUES_PER_POINT + 11], points[n*VALUES_PER_POINT + 15]);
 
-	//printf("MAT %d ", n);
-	//printMatrix(mat1);
+	glm::mat4 mat1 = glm::mat4(points[n*VALUES_PER_POINT + 0], points[n*VALUES_PER_POINT + 1], points[n*VALUES_PER_POINT + 2], 0.0f,
+		points[n*VALUES_PER_POINT + 4], points[n*VALUES_PER_POINT + 5], points[n*VALUES_PER_POINT + 6], 0.0f,
+		points[n*VALUES_PER_POINT + 8], points[n*VALUES_PER_POINT + 9], points[n*VALUES_PER_POINT + 10], 0.0f,
+		points[n*VALUES_PER_POINT + 12], points[n*VALUES_PER_POINT + 13], points[n*VALUES_PER_POINT + 14], 1.0f);
+
 	glm::mat4 res = glm::translate(mat1, glm::vec3(vx, vy, vz));
-	//printf("RES %d ", n);
-	//printMatrix(res);
-
+	
 	memcpy(points + n*VALUES_PER_POINT*sizeof(float), glm::value_ptr(res), 16 * sizeof(float));
 
-	//printf("memcpy DONE!!\n");
+	points[n*VALUES_PER_POINT + 3] = color[0];
+	points[n*VALUES_PER_POINT + 7] = color[1];
+	points[n*VALUES_PER_POINT + 11] = color[2];
+
 	return n;
 }
 
@@ -637,16 +637,21 @@ extern "C" __declspec(dllexport) int scale(int n,
 		scale(n + 2, vx, vy, vz);
 	}
 
+	glm::vec4 color(points[n*VALUES_PER_POINT + 3], points[n*VALUES_PER_POINT + 7], points[n*VALUES_PER_POINT + 11], points[n*VALUES_PER_POINT + 15]);
 
-	glm::mat4 mat1 = glm::mat4(points[n*VALUES_PER_POINT + 0], points[n*VALUES_PER_POINT + 1], points[n*VALUES_PER_POINT + 2], points[n*VALUES_PER_POINT + 3],
-		points[n*VALUES_PER_POINT + 4], points[n*VALUES_PER_POINT + 5], points[n*VALUES_PER_POINT + 6], points[n*VALUES_PER_POINT + 7],
-		points[n*VALUES_PER_POINT + 8], points[n*VALUES_PER_POINT + 9], points[n*VALUES_PER_POINT + 10], points[n*VALUES_PER_POINT + 11],
-		points[n*VALUES_PER_POINT + 12], points[n*VALUES_PER_POINT + 13], points[n*VALUES_PER_POINT + 14], points[n*VALUES_PER_POINT + 15]);
-	printMatrix(mat1);
+	glm::mat4 mat1 = glm::mat4(points[n*VALUES_PER_POINT + 0], points[n*VALUES_PER_POINT + 1], points[n*VALUES_PER_POINT + 2], 0.0f,
+		points[n*VALUES_PER_POINT + 4], points[n*VALUES_PER_POINT + 5], points[n*VALUES_PER_POINT + 6], 0.0f,
+		points[n*VALUES_PER_POINT + 8], points[n*VALUES_PER_POINT + 9], points[n*VALUES_PER_POINT + 10], 0.0f,
+		points[n*VALUES_PER_POINT + 12], points[n*VALUES_PER_POINT + 13], points[n*VALUES_PER_POINT + 14], 1.0f);
+
 	glm::mat4 res = glm::scale(mat1, glm::vec3(vx, vy, vz));
 
 	memcpy(points + n*VALUES_PER_POINT*sizeof(float), glm::value_ptr(res), 16 * sizeof(float));
-
+	
+	points[n*VALUES_PER_POINT + 3] = color[0];
+	points[n*VALUES_PER_POINT + 7] = color[1];
+	points[n*VALUES_PER_POINT + 11] = color[2];
+	
 	return n;
 }
 
@@ -665,11 +670,11 @@ extern "C" __declspec(dllexport) int transform(int n, float* trs) {
 		points[n*VALUES_PER_POINT + 8], points[n*VALUES_PER_POINT + 9], points[n*VALUES_PER_POINT + 10], 0.0f,
 		points[n*VALUES_PER_POINT + 12], points[n*VALUES_PER_POINT + 13], points[n*VALUES_PER_POINT + 14], 1.0f);
 
-	printMatrix(mat1);
+	//printMatrix(mat1);
 	glm::mat4 tr_mat = listToMat4(trs);
-	printMatrix(tr_mat);
+	//printMatrix(tr_mat);
 	glm::mat4 res = tr_mat * mat1;
-	printMatrix(res);
+	//printMatrix(res);
 
 
 
@@ -714,190 +719,6 @@ GLfloat lastY = HEIGHT / 2.0;
 GLfloat fov = 45.0f;
 double xpos_1, ypos_1, xpos_2, ypos_2, speed = 1;
 GLenum pressed = GL_FALSE;
-
-void scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
-{/*
-	if (fov >= 1.0f && fov <= 45.0f)
-		fov -= yoffset;
-	if (fov <= 1.0f)
-		fov = 1.0f;
-	if (fov >= 45.0f)
-		fov = 45.0f;
-		*/
-
-	if (std::abs(xoffset) < std::abs(yoffset))
-		cameraPos += ((GLfloat)yoffset * 0.1f) * cameraUp;
-	else
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * ((GLfloat)yoffset) * 40.0f;
-
-}
-int shaderid = 0;
-// Is called whenever a key is pressed/released via GLFW
-void key_callback(GLFWwindow* window, int key, int scancode, int action, int mode)
-{
-	if (action == GLFW_PRESS)
-		pressed = GL_TRUE;
-	else if (action == GLFW_RELEASE)
-		pressed = GL_FALSE;
-
-	if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
-	if (key >= 0 && key < 1024)
-	{
-		//printf("KEY %d\n", key);
-		if (action == GLFW_PRESS)
-			keys[key] = true;
-		else if (action == GLFW_RELEASE)
-			keys[key] = false;
-	}
-
-	if (key == GLFW_KEY_1 && action == GLFW_PRESS)
-		shaderid = 0;
-	if (key == GLFW_KEY_2 && action == GLFW_PRESS)
-		shaderid = 1;
-	if (key == GLFW_KEY_3 && action == GLFW_PRESS)
-		shaderid = 2;
-
-}
-
-
-void mouse_button_callback(GLFWwindow* window, int button, int action, int mods)
-{
-
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_PRESS) {
-		pressed = GL_TRUE;
-		glfwGetCursorPos(window, &xpos_1, &ypos_1);
-	}
-	if (button == GLFW_MOUSE_BUTTON_LEFT && action == GLFW_RELEASE) {
-		pressed = GL_FALSE;
-	}
-	if (button == GLFW_MOUSE_BUTTON_RIGHT && action == GLFW_RELEASE)
-		posLookAt = glm::vec3(0.0f);
-}
-
-
-void mouse_callback(GLFWwindow* window, double xpos, double ypos)
-{
-	if (!pressed)
-	{
-		return;
-	}
-	if (firstMouse)
-	{
-		lastX = xpos;
-		lastY = ypos;
-		firstMouse = false;
-	}
-
-	GLfloat xoffset = xpos - lastX;
-	GLfloat yoffset = lastY - ypos; // Reversed since y-coordinates go from bottom to left
-	lastX = xpos;
-	lastY = ypos;
-
-	GLfloat sensitivity = 0.05;	// Change this value to your liking
-	xoffset *= sensitivity;
-	yoffset *= sensitivity;
-
-	yaw += xoffset;
-	pitch += yoffset;
-
-	// Make sure that when pitch is out of bounds, screen doesn't get flipped
-	if (pitch > 89.0f)
-		pitch = 89.0f;
-	if (pitch < -89.0f)
-		pitch = -89.0f;
-
-	glm::vec3 front;
-	front.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-	front.y = sin(glm::radians(pitch));
-	front.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-	cameraFront = glm::normalize(front);
-}
-
-void do_movement() {
-
-	//float distance = glm::distance( posLookAt , cameraPos);
-	//printf("distance : %f\n", distance);
-	// Camera controls
-	GLfloat cameraSpeed = 0.05f;
-	if (keys[GLFW_KEY_W]) {
-		cameraPos += cameraSpeed * cameraFront;
-		cameraFront = -cameraPos + posLookAt;
-
-	}
-	if (keys[GLFW_KEY_S]) {
-		cameraPos -= cameraSpeed * cameraFront;
-		cameraFront = -cameraPos + posLookAt;
-
-	}
-	if (keys[GLFW_KEY_A]) {
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * glm::distance(cameraPos, glm::vec3(0.0f));
-		cameraFront = -cameraPos + posLookAt;
-
-	}
-	if (keys[GLFW_KEY_D]) {
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * glm::distance(cameraPos, glm::vec3(0.0f));
-		cameraFront = -cameraPos + posLookAt;
-
-	}
-	if (keys[GLFW_KEY_RIGHT])
-	{
-		cameraPos += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * 50.0f;
-		posLookAt += glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * 50.0f;
-		cameraFront = -cameraPos + posLookAt;
-
-	}
-	if (keys[GLFW_KEY_LEFT])
-	{
-		cameraPos -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * 50.0f;
-		posLookAt -= glm::normalize(glm::cross(cameraFront, cameraUp)) * cameraSpeed * 50.0f;
-		cameraFront = -cameraPos + posLookAt;
-
-	}
-	if (keys[GLFW_KEY_UP])
-	{
-		cameraPos = glm::vec3(cameraPos.x + cameraFront.x*cameraSpeed, cameraPos.y + cameraFront.y*cameraSpeed, cameraPos.z);
-		posLookAt = glm::vec3(posLookAt.x + cameraFront.x*cameraSpeed, posLookAt.y + cameraFront.y*cameraSpeed, posLookAt.z);
-		cameraFront = -cameraPos + posLookAt;
-
-	}
-	if (keys[GLFW_KEY_DOWN])
-	{
-		cameraPos = glm::vec3(cameraPos.x - cameraFront.x*cameraSpeed, cameraPos.y - cameraFront.y*cameraSpeed, cameraPos.z);
-		posLookAt = glm::vec3(posLookAt.x - cameraFront.x*cameraSpeed, posLookAt.y - cameraFront.y*cameraSpeed, posLookAt.z);
-		cameraFront = -cameraPos + posLookAt;
-
-	}
-
-	if (keys[GLFW_KEY_R]) {
-		cameraPos += cameraSpeed * cameraUp;
-		posLookAt += cameraSpeed * cameraUp;
-		cameraFront = -cameraPos + posLookAt;
-
-	}
-	if (keys[GLFW_KEY_F]) {
-		cameraPos -= cameraSpeed * cameraUp;
-		posLookAt -= cameraSpeed * cameraUp;
-		cameraFront = -cameraPos + posLookAt;
-
-	}
-
-
-	if (keys[GLFW_KEY_P]) {
-		glPointSize(8.0f);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
-
-	}
-	if (keys[GLFW_KEY_L]) {
-		glEnable(GL_LINE_SMOOTH);
-		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-
-	}
-	if (keys[GLFW_KEY_O]) {
-		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-
-	}
-}
 
 int nbFrames = 0;
 double lastTime = 0.0;
@@ -982,7 +803,7 @@ GLFWwindow* window;
 GLuint shaderProgram, shaderProgram1, shaderProgram2;
 glm::mat4 model, view, projection;
 GLint modelLoc, viewLoc, projLoc;
-sasmaster::Camera3D tCam(glm::vec3(0.0f, 0.0f, 100.0f));
+sasmaster::Camera3D* tCam;
 //Init trackball instance :
 sasmaster::TrackballControls* tball;
 
@@ -1019,14 +840,6 @@ extern "C" __declspec(dllexport) int init(int n) {
 	int width, height;
 	glfwGetFramebufferSize(window, &width, &height);
 	glViewport(0, 0, width, height);
-
-	// Set the required callback functions
-	glfwSetKeyCallback(window, key_callback);
-	glfwSetScrollCallback(window, scroll_callback);
-	glfwSetCursorPosCallback(window, mouse_callback);
-	glfwSetMouseButtonCallback(window, mouse_button_callback);
-	// GLFW Options
-	//glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
 	// Initialize GLEW
 	glewExperimental = GL_TRUE;
@@ -1135,16 +948,16 @@ extern "C" __declspec(dllexport) int init(int n) {
 	glVertexAttribPointer(posAttrib, 1, GL_FLOAT, GL_FALSE, VALUES_PER_POINT * sizeof(GLfloat), (void*)(19 * sizeof(GLfloat)));
 
 	//init camera object:
-	//tCam = Camera3D(glm::vec3(0.0f, 0.0f, 100.0f));
+	tCam = new Camera3D(glm::vec3(0.0f, 0.0f, 100.0f));
 	//Init trackball instance :
-	tball = &TrackballControls::GetInstance(&tCam, glm::vec4(0.0f, 0.0f, width, height));
+	tball = &TrackballControls::GetInstance(tCam, glm::vec4(0.0f, 0.0f, width, height));
 	//Init GLFW callbacks:
 	tball->Init(window);
 
 	// Camera/View transformation
-	view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
+	// view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
 	// Projection 
-	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 1000.0f);
+	//projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 1000.0f);
 
 	// Create transformations
 	model = glm::mat4(1.0f);
@@ -1153,9 +966,9 @@ extern "C" __declspec(dllexport) int init(int n) {
 	projection = glm::perspective(glm::radians(45.0f), (GLfloat)width / (GLfloat)height, 0.1f, 1000.0f);
 	*/
 	// Get their uniform location
-	modelLoc = glGetUniformLocation(shaderProgram, "model");
-	viewLoc = glGetUniformLocation(shaderProgram, "view");
-	projLoc = glGetUniformLocation(shaderProgram, "projection");
+	//modelLoc = glGetUniformLocation(shaderProgram, "model");
+	//viewLoc = glGetUniformLocation(shaderProgram, "view");
+	//projLoc = glGetUniformLocation(shaderProgram, "projection");
 
 	/*
 	GLint tex_checkerboard = glGetUniformLocation(shaderProgram, "tex_checkerboard");
@@ -1220,52 +1033,26 @@ extern "C" __declspec(dllexport) int end_cycle() {
 extern "C" __declspec(dllexport) void pool() {
 	//printf("POOL Thread ID - %x ---- PID - %d \n", pthread_self(), getpid());
 	glfwPollEvents();
-	do_movement();
+	// do_movement();
 }
 
 extern "C" __declspec(dllexport) void cycle() {
 
-	//int width, height;
-	//glfwGetFramebufferSize(window, &width, &height);
-	//glViewport(0, 0, width, height);
-	//printf("Testing Cycle %d\n",TestCycle++);
+
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
 
-	//        if (glfwGetKey(window, GLFW_KEY_H) == GLFW_PRESS){
 	tball->Update();
-	/*if ( cycle_n++ == -10 ){
-	cycle_n = 0;
-	n_points = 0;
-	city(citysize);
-	send_data();
-	citysize = (citysize+5)%100;
-	}*/
-	//            printf("citysize: %d\n",citysize );
-	//        }
-	/*        if (glfwGetKey(window, GLFW_KEY_J) == GLFW_PRESS){
-	n_points = 0;
-	citysize-=20;
-	city(citysize);
-	send_data();
-	printf("citysize: %d\n",citysize );
-	}*/
+
 	// Clear the colorbuffer
 	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 
 	// Projection 
-	//if(pressed) computeMatricesFromInputs();
-	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.001f, 1000.0f); // getProjectionMatrix(); //
-	//       posLookAt = glm::vec3(0.0f);
-	//view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp); //getViewMatrix(); //
-	//view = glm::lookAt(cameraPos, posLookAt, cameraUp);
-	//view = glm::lookAt(glm::vec3(camX, camY, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));//        model = glm::mat4(1.0f);
-	//view = glm::mat4(1.0f);
-	//projection = glm::mat4(1.0f);
-
-	view = tCam.m_viewMatr;
+	projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.001f, 1000.0f);
+	// View
+	view = tCam->m_viewMatr;
 
 	GLint camPos = glGetUniformLocation(shaderProgram, "cameraPos");
 	GLint lookPos = glGetUniformLocation(shaderProgram, "lookat");
@@ -1273,15 +1060,6 @@ extern "C" __declspec(dllexport) void cycle() {
 
 	// Pass them to the shaders
 	glm::mat4 mvp = projection * view * model;
-
-	//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-	//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	//glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-
-
-	//printf("Testing n_points %d\n",n_points);
-	//        glEnable(GL_LINE_SMOOTH);
-	//        glPolygonMode(GL_FRONT_AND_BACK,GL_LINE);
 
 	switch (tball->shaderid)
 	{
@@ -1325,130 +1103,12 @@ extern "C" __declspec(dllexport) void cycle() {
 		break;
 	}
 
-	/*        n_points=0;
-	city(100);
-	send_data();
-	glPolygonMode(GL_FRONT_AND_BACK,GL_FILL);
-	glDrawArrays(GL_POINTS, 0, n_points);
-	/*
-	//glfwSwapBuffers(window);
 
-	/*
-	glViewport(width-400, height - 400, 300, 300);
-
-	glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
-	//glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-	view = glm::lookAt(glm::vec3(0.0f, 0.0f, 100.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//view = glm::lookAt(glm::vec3(camX, camY, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));//        model = glm::mat4(1.0f);
-	//view = glm::mat4(1.0f);
-	//projection = glm::mat4(1.0f);
-
-	// Pass them to the shaders
-	glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-	glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
-	glUniform3fv(lookPos, 1, glm::value_ptr(cameraFront));
-
-	//printf("Testing n_points %d\n",n_points);
-
-	glDrawArrays(GL_POINTS, 0, n_points);
-	*/
 	glfwSwapBuffers(window);
 
 	calcFPS(window);
 
 }
-
-extern "C" __declspec(dllexport) int start() {
-	//init(200);
-
-	//printf("CENAS\n");
-	//fflush(stdout);
-	int coisas = 0;
-	int frame = 0;
-	while (!glfwWindowShouldClose(window))
-	{
-		glfwPollEvents();
-
-		//printf("STUF\n");
-		//fflush(stdout);
-
-		do_movement();
-
-		//printf("CENAS\n");
-		//fflush(stdout);
-		/*if(frame++>100)
-			glfwSetWindowShouldClose(window, GL_TRUE);
-			*/
-		if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-			glfwSetWindowShouldClose(window, GL_TRUE);
-
-		if (glfwGetKey(window, GLFW_KEY_SPACE) == GLFW_PRESS)
-			shaderid = shaderid++ % 3;
-
-
-		if (shaderid == 0)
-			glUseProgram(shaderProgram);
-		else
-			glUseProgram(shaderProgram1);
-		// Clear the colorbuffer
-		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-
-
-		posLookAt = glm::vec3(0.0f);
-		view = glm::lookAt(cameraPos, posLookAt, cameraUp);
-		//view = glm::lookAt(glm::vec3(camX, camY, 0.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));//        model = glm::mat4(1.0f);
-		//view = glm::mat4(1.0f);
-		//projection = glm::mat4(1.0f);
-
-
-		GLint camPos = glGetUniformLocation(shaderProgram, "cameraPos");
-		GLint mvpLoc = glGetUniformLocation(shaderProgram, "MVP");
-
-		// Pass them to the shaders
-		glm::mat4 mvp = projection * view * model;
-		glUniformMatrix4fv(mvpLoc, 1, GL_FALSE, glm::value_ptr(mvp));
-		//glUniformMatrix4fv(modelLoc, 1, GL_FALSE, glm::value_ptr(model));
-		//glUniformMatrix4fv(viewLoc, 1, GL_FALSE, glm::value_ptr(view));
-		//glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projection));
-		glUniform3fv(camPos, 1, glm::value_ptr(cameraPos));
-
-		//glPatchParameteri(GL_PATCH_VERTICES, 4);       // tell OpenGL that every patch has 16 verts
-		//glDrawArrays(GL_PATCHES, 0, 5);
-		//printf("Testing n_points %d\n",n_points);
-
-		//printf("CENAS\n");
-		//fflush(stdout);
-
-		glDrawArrays(GL_POINTS, 0, n_points);
-
-		//printf("CENAS\n");
-		//fflush(stdout);
-
-		glfwSwapBuffers(window);
-		//showFPS();
-		//usleep(10);
-		calcFPS(window);
-
-	}
-
-	glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glfwTerminate();
-
-	free(points);
-	p_npoints = n_points;
-	n_points = 0;
-	citysize = 10;
-	printf("p_npoints = %d\n", p_npoints);
-
-
-	return p_npoints;
-}
-
 
 #define PI          3.14159265358979
 #define BLACK   glm::vec3(0.0f,0.0f,0.0f)
