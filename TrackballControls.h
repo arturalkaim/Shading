@@ -74,6 +74,7 @@ namespace sasmaster{
 		bool m_noRoll;
 		bool m_staticMoving;
 
+		int shaderid = 0;
 	private:
 		TrackballControls(Camera3D* cam,glm::vec4 screenSize);
 

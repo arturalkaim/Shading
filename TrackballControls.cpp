@@ -467,7 +467,28 @@ namespace sasmaster{
 		if (!m_enabled) return;
 
 		m_prevState = m_state;
+		
+		if (key == GLFW_KEY_1)
+			shaderid = 0;
+		if (key == GLFW_KEY_2)
+			shaderid = 1;
+		if (key == GLFW_KEY_3)
+			shaderid = 2;
 
+		if (key == GLFW_KEY_P) {
+			glPointSize(8.0f);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_POINT);
+
+		}
+		if (key == GLFW_KEY_L) {
+			glEnable(GL_LINE_SMOOTH);
+			glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+		}
+		if (key == GLFW_KEY_O) {
+			glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+		}
 		//   var state = OpenTK.Input.Keyboard.GetState();
 
 		if (m_state != TCB_STATE::NONE)
