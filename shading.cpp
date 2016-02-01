@@ -121,8 +121,8 @@ int buildPoint(int n,
 	points[n*VALUES_PER_POINT + 18] = scale;
 	points[n*VALUES_PER_POINT + 19] = ratio;
 
-
-	//printMatrixV(n);
+	//printMatrix(mat);
+	printMatrixV(n);
 	return n;
 }
 
@@ -236,6 +236,7 @@ glm::mat4 buildTMatrixFromIrregularPoint(float x_bottom, float y_bottom, float z
 		p_1_angle, p_2_angle, p_3_angle, 0.0f,
 		x_up, y_up, z_up, 1.0f);
 
+	printMatrix(ret1);
 	return ret1;
 
 }
@@ -948,7 +949,7 @@ extern "C" __declspec(dllexport) int init(int n) {
 	glVertexAttribPointer(posAttrib, 1, GL_FLOAT, GL_FALSE, VALUES_PER_POINT * sizeof(GLfloat), (void*)(19 * sizeof(GLfloat)));
 
 	//init camera object:
-	tCam = new Camera3D(glm::vec3(0.0f, 0.0f, 100.0f));
+	tCam = new Camera3D(cameraPos);
 	//Init trackball instance :
 	tball = &TrackballControls::GetInstance(tCam, glm::vec4(0.0f, 0.0f, width, height));
 	//Init GLFW callbacks:
@@ -1038,6 +1039,9 @@ extern "C" __declspec(dllexport) void pool() {
 
 extern "C" __declspec(dllexport) void cycle() {
 
+	int width, height;
+	glfwGetFramebufferSize(window, &width, &height);
+	glViewport(0, 0, width, height);
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
 		glfwSetWindowShouldClose(window, GL_TRUE);
