@@ -1,5 +1,5 @@
 #lang racket
-(require rosetta/glfast)
+(require "backend.rkt")
 
 
 (init 10)
@@ -15,7 +15,7 @@
           [p13 (+y p1 (/ size -3))])
       (point p10 0.5 0.0) (point (u0) 0.5 1.0 0.0 0.0) (point p1  0.5 0.0 0.5 0.0)
       (mirror (list (point (+pol p1 size pi/2) 0.5 0.0 0.5 1.0)(point (+pol p1 size 3pi/2) 0.5 0.0 0.5 1.0)(point (+pol p1 size 0.0) 0.5 0.0 0.5 1.0)
-                    ;(irregularPyramid3 p1 p10 (/ size 3) -pi (/ size 3) pi/2 (/ size 3) pi)
+                    (irregularPyramid p1 (list (/ size 2) size (/ size 2)) (list pi/2 0.0 3pi/2) p10  0.0 0.5 1.0)
                     (irregularPyramid p1 (list (/ size 2) size (/ size 2)) (list pi/2 0.0 3pi/2) p10)) (u0) (ux))
       )))
 

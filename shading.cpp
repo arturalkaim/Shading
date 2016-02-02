@@ -1019,6 +1019,7 @@ extern "C" __declspec(dllexport) int end_cycle() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwTerminate();
 
+	
 		free(points);
 		p_npoints = n_points;
 		n_points = 0;
