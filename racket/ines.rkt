@@ -1,22 +1,7 @@
 #lang racket
-(require ffi/unsafe
-         ffi/unsafe/define
-         math/flonum
-         math/matrix
-         "sliders.rkt"
-         "base.rkt"
-         (prefix-in p3d: pict3d)
+(require rosetta/autocad
          )
 
-(define (vpol rho phi)
-  (p3d:dir (* rho (cos phi))
-           (* rho (sin phi))
-           0.0))
-#;(define (unitize v)
-    (p3d:dir-normalize v))
-
-(define (v*v v1 v2)
-  (p3d:dir-cross v1 v2))
 
 ;(p3d:dir-dy rot-dir) (p3d:dir-dz rot-dir)
 
@@ -84,8 +69,8 @@
           (p02 (media-pontos p p2)))
       (let ((pp1 (+c p01 (*c n l)))
             (pp2 (+c p02 (*c n l))))
-        (right-cuboid p01 c h pp1 0.9 0.9 0.9)
-        (right-cuboid pp2 c h p02 0.9 0.9 0.9)))))
+        (right-cuboid p01 c h pp1)
+        (right-cuboid pp2 c h p02)))))
 
 (define maxy (make-parameter 7))
 
@@ -99,27 +84,32 @@
 (define (brick-wall minx maxx miny maxy contx conty)
   (itera-quadrangulos tijolo (malha-teste  minx maxx miny maxy contx conty)))
 
-
+#;
 (setup brick-wall (list -21 21 0 10 25 12))
+(brick-wall -21 21 0 10 25 12)
+#;(define (run)
+  (pool)
+  (cycle)
+  (run))
 
-(time
+#;(time
  (begin
    (send_data)
-   (thread while)))
+   (thread run)))
 
 
-(sliders
- "Brick Wall"
- (lambda (minx maxx miny maxy contx conty)
-   (when (and (<= miny maxy) (< minx maxx)) 
-     (update (list  minx maxx miny maxy contx conty))
-     ))
- '(("minx" -30 30 -20)
-   ("maxx" 0 30 20)
-   ("miny" -10 10 0)
-   ("maxy" 0 10 5)
-   ("contx" 1 100 5)
-   ("conty" 1 50 5)))
+#;(sliders
+   "Brick Wall"
+   (lambda (minx maxx miny maxy contx conty)
+     (when (and (<= miny maxy) (< minx maxx)) 
+       (update (list  minx maxx miny maxy contx conty))
+       ))
+   '(("minx" -30 30 -20)
+     ("maxx" 0 30 20)
+     ("miny" -10 10 0)
+     ("maxy" 0 10 5)
+     ("contx" 1 100 5)
+     ("conty" 1 50 5)))
 
 
 

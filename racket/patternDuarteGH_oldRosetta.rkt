@@ -1,6 +1,7 @@
 #lang racket
 (require (planet aml/rosetta))
-(backend rhino5)
+(require racket/date)
+(backend autocad)
 
 (define (itera-pts f ptss)
   (for/list ((pts0 ptss))
@@ -211,10 +212,11 @@
      p (ux))))
 
 (define (run n s)
-  (time (itera-quads pattern (map-division (lambda (i j)
-                                             (xyz i j 0))
-                                           (- n) n s
-                                           (- n) n (/ s 2)))))
+  (begin (itera-quads pattern (map-division (lambda (i j)
+                                       (xyz i j 0))
+                                     (- n) n s
+                                     (- n) n (/ s 2)))
+         ))
 
 
 
@@ -233,9 +235,26 @@
 ;10 6 cpu time: 1375 real time: 41561 gc time: 77
 ;10 8 cpu time: 2437 real time: 101314 gc time: 78 cpu time: 2766 real time: 107745 gc time: 142
 ;10 10 cpu time: 12625 real time: 225979 gc time: 1248
+;20 10 227047  222080
+;10 14 740052 (30729 minimizado)
 ;20 20 cpu time: 22141 real time: 1045044 gc time: 544
 (define (run10) (run 10 10))
-(let ([id (thread run10)])
-  (sleep 2)
-  (kill-thread id)
-  id)
+;(run 10 14)
+
+(define out (open-output-file (format "r-times-~a-~a.tms" "autocad" "padrao") #:mode 'text #:exists 'append))
+(define (test)
+  (let ([sizes (reverse (list 10 20 30))]
+        [divs (reverse (list 4 6 8 10 12 14 16 18 20))])
+    (for ((s sizes))
+      (for ((d divs))
+        (define input (list s d))
+        (define-values (res cpu real gc)(time-apply run input))
+        (writeln (format "~a ~a" s d) out)
+        (writeln real out)))))
+(current-date)
+;(test)
+(current-date)
+#;(let ([id (thread run10)])
+    (sleep 2)
+    (kill-thread id)
+    id)

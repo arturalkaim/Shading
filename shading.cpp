@@ -104,7 +104,7 @@ int buildPoint(int n,
 		printf("TEST %d  :  %d\n", vecSize, n_points);
 	}
 
-	printMatrix(mat);
+	//printMatrix(mat);
 
 	memcpy(points + n*VALUES_PER_POINT, glm::value_ptr(mat), 16 * sizeof(float));
 
@@ -122,7 +122,7 @@ int buildPoint(int n,
 	points[n*VALUES_PER_POINT + 19] = ratio;
 
 	//printMatrix(mat);
-	printMatrixV(n);
+	//printMatrixV(n);
 	return n;
 }
 
@@ -236,7 +236,7 @@ glm::mat4 buildTMatrixFromIrregularPoint(float x_bottom, float y_bottom, float z
 		p_1_angle, p_2_angle, p_3_angle, 0.0f,
 		x_up, y_up, z_up, 1.0f);
 
-	printMatrix(ret1);
+	//printMatrix(ret1);
 	return ret1;
 
 }
@@ -957,7 +957,7 @@ extern "C" __declspec(dllexport) int init(int n) {
 
 	// Camera/View transformation
 	// view = glm::lookAt(cameraPos, cameraPos + cameraFront, cameraUp);
-	// Projection 
+	// Projection     
 	//projection = glm::perspective(fov, (GLfloat)WIDTH / (GLfloat)HEIGHT, 0.1f, 1000.0f);
 
 	// Create transformations
@@ -1019,7 +1019,7 @@ extern "C" __declspec(dllexport) int end_cycle() {
 		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 		glfwTerminate();
 
-	
+
 		free(points);
 		p_npoints = n_points;
 		n_points = 0;
@@ -1032,6 +1032,21 @@ extern "C" __declspec(dllexport) int end_cycle() {
 
 }
 
+extern "C" __declspec(dllexport) int close() {
+		glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glfwTerminate();
+
+
+		free(points);
+		p_npoints = n_points;
+		n_points = 0;
+		citysize = 10;
+		cycle_n = 0;
+		printf("p_npoints = %d\n", p_npoints);
+		//exit(0);
+		return 0;
+}
 extern "C" __declspec(dllexport) void pool() {
 	//printf("POOL Thread ID - %x ---- PID - %d \n", pthread_self(), getpid());
 	glfwPollEvents();
@@ -1045,7 +1060,7 @@ extern "C" __declspec(dllexport) void cycle() {
 	glViewport(0, 0, width, height);
 
 	if (glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-		glfwSetWindowShouldClose(window, GL_TRUE);
+		glfwSetWindowShouldClose(window, GL_TRUE);	
 
 	tball->Update();
 

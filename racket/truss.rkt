@@ -1,5 +1,5 @@
 #lang racket
-(require rosetta)
+(require rosetta/autocad)
 
 ;;#lang rosetta-racket-debug
 
@@ -145,7 +145,6 @@
    ;(perspective 197)
    (moebius-truss 1 0 (* pi 4) 80 0 0.3 1));)
 
-(backend opengl)
 
 (sliders
  "Moebius Truss"

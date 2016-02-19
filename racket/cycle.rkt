@@ -1,12 +1,5 @@
 #lang racket
-(require ffi/unsafe
-         ffi/unsafe/define
-         math/flonum
-         "base.rkt"
-         (prefix-in p3d: pict3d)
-         racket/trace
-         "sliders.rkt"
-         )
+(require rosetta/autocad)
 
 ;(init 1000)
 
@@ -32,14 +25,14 @@
 (define truss-node-radius (make-parameter 0.08))
 
 (define (no-trelica p)
-  (sphere p (truss-node-radius) 0.7 0.7 0.7))
+  (sphere p (truss-node-radius)))
 
 (define truss-radius-bar (make-parameter 0.01))
 
 (define (barra-trelica p0 p1)
   (when (not (=c? p0 p1))
     ; (empty-shape)
-    (cylinder p0 (truss-radius-bar) p1  0.6 0.6 0.6)))
+    (cylinder p0 (truss-radius-bar) p1)))
 
 (define (nos-trelica ps)
   (map no-trelica ps))
@@ -162,9 +155,9 @@
   
   (render-truss (sin-u*v  n sizex sizey)))
 ;(trace while cycle pool)
-(setup truss (list 20 10 10))
+;(setup truss (list 20 10 10))
 
-(time
+#;#;(time
  (begin
    (send_data)
    (thread while)))
@@ -183,7 +176,7 @@
 
 
 #;(animate)
-(sliders
+#;(sliders
  "Truss"
  (lambda (n sizex sizey angle cam-z)
    (begin
@@ -197,7 +190,7 @@
 ;(pyramid (xyz 0.0 0.0 0.0) 10.0 10.0 (xyz 0.0 0.0 5.0) 1.0 0.0 1.0)
 
 
-
+(truss 5 10 10)
 
 ;(cylinder 0.0 0.0 0.0 10.0 5.4 0.0 0.0 0.0 29.0 0.0 1.0 0.0)
 ;(cylinder-p (xyz 0.0 0.0 0.0) 2.0 (xyz 10.0 5.4 0.0))
