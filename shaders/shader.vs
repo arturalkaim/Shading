@@ -1,4 +1,3 @@
-// Vertex shader + vec4(sin(time)/1,cos(time)/1,0,1);
 const GLchar* vertexShaderSrc = GLSL(
     in vec4 mat_1;
     in vec4 mat_2;

@@ -1,11 +1,8 @@
 // Geometry shader
 const GLchar* geometryShaderSrc = GLSL(
     layout(points) in;
-    layout(triangle_strip, max_vertices = 255) out;
+    layout(triangle_strip, max_vertices = 138) out;
 
-    //uniform mat4 view;
-    //uniform mat4 projection;
-    //uniform mat4 model;
     uniform vec3 cameraPos;
     uniform vec3 lookat;
 	uniform mat4 MVP;
@@ -17,7 +14,7 @@ const GLchar* geometryShaderSrc = GLSL(
 	in float vRatio[];
 
     out vec4 gColor;
-    out vec2 vTex;
+
     const float PI = 3.1415926;
     mat4 tMat = vMat[0];
 	
@@ -31,7 +28,7 @@ const GLchar* geometryShaderSrc = GLSL(
     int calcSides(int sides){
         float dist = distance(aux,vec4(cameraPos,1.0));
         if(dist > vScale[0]*2){
-             return  int(min(sides,max(4.0,(vScale[0]/dist)*(vSides[0]*30.0))));
+             return  int(min(sides,max(14.0,(vScale[0]/dist)*(vSides[0]*30.0))));
         }
         return sides;
     }
@@ -46,12 +43,10 @@ const GLchar* geometryShaderSrc = GLSL(
             float ang = ((PI * 2.0) / sides * i) + vRatio[0];
             if(i%2==(sides%2)){
                 gl_Position = aux + MVP * tMat *  vec4(0.0,0.0,0.0,1.0);
-                vTex = vec2(i/sides,1.0);
                 EmitVertex();
             }
             // Offset from center of point (0.3 to accomodate for aspect ratio)
             gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, 0.0, 1.0);
-            vTex = vec2(i/sides,1.0);
             EmitVertex();
         }
         EndPrimitive();
@@ -166,12 +161,10 @@ const GLchar* geometryShaderSrc = GLSL(
                 //gColor = gColor * (sin(ang)+1)*0.5;
 				gColor = gColorAux * vec4(vec3((sin(ang)+1)*0.4+0.2),1.0);
 				gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
-                vTex = vec2(i/sides,0.0);
                 EmitVertex();
 
                 //gColor = gColorAux;
                 gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
-                vTex = vec2(i/sides,1.0);
                 EmitVertex();
 
             }
@@ -184,14 +177,12 @@ const GLchar* geometryShaderSrc = GLSL(
                 float ang = ((PI * 2.0) / sides * i) + (PI / 4);
                 if(i%2==(sides%2)){
                     gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,-h,1.0f);
-                    vTex = vec2(i/sides,0.0);
                     EmitVertex();
                 }
 
                 //gColor = vec4(1.0,0.5,0.0,1.0);
                 // Offset from center of point (0.3 to accomodate for aspect ratio)
                 gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
-                vTex = vec2(i/sides,0.0);
                 EmitVertex();
 
             }
@@ -203,13 +194,11 @@ const GLchar* geometryShaderSrc = GLSL(
                 float ang = ((PI * 2.0) / sides * i) + (PI / 4);
                 if(i%2==(sides%2)){
                     gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,h,1.0f);
-                    vTex = vec2(i/sides,1.0);
                     EmitVertex();
                 }
                 //gColor = vec4(topColor,topColor,topColor,1.0);
                 // Offset from center of point (0.3 to accomodate for aspect ratio)
                 gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, h, 1.0);
-                vTex = vec2(i/sides,1.0);
                 EmitVertex();
 
             }
@@ -235,12 +224,10 @@ const GLchar* geometryShaderSrc = GLSL(
                     //gColor = gColor * (sin(ang)+1)*0.5;
 					gColor = gColorAux * vec4(vec3((sin(ang)+1)*0.4+0.2),1.0);
 					gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
-                    vTex = vec2(i/sides,0.0);
                     EmitVertex();
 
                     //gColor = gColorAux;
                     gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width1, -sin(ang) * l1, h, 1.0);
-                    vTex = vec2(i/sides,1.0);
                     EmitVertex();
 
                 }
@@ -253,14 +240,12 @@ const GLchar* geometryShaderSrc = GLSL(
                     float ang = ((PI * 2.0) / sides * i) + (PI / 4);
                     if(i%2==(sides%2)){
                         gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,-h,1.0f);
-                        vTex = vec2(i/sides,0.0);
                         EmitVertex();
                     }
 
                     //gColor = vec4(1.0,0.5,0.0,1.0);
                     // Offset from center of point (0.3 to accomodate for aspect ratio)
                     gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width, -sin(ang) * l, -h, 1.0);
-                    vTex = vec2(i/sides,0.0);
                     EmitVertex();
 
                 }
@@ -272,13 +257,11 @@ const GLchar* geometryShaderSrc = GLSL(
                     float ang = ((PI * 2.0) / sides * i) + (PI / 4);
                     if(i%2==(sides%2)){
                         gl_Position = aux + MVP * tMat *  vec4(0.0f,0.0f,h,1.0f);
-                        vTex = vec2(i/sides,1.0);
                         EmitVertex();
                     }
                     //gColor = vec4(topColor,topColor,topColor,1.0);
                     // Offset from center of point (0.3 to accomodate for aspect ratio)
                     gl_Position = aux + MVP * tMat *  vec4(cos(ang) * width1, -sin(ang) * l1, h, 1.0);
-                    vTex = vec2(i/sides,1.0);
                     EmitVertex();
 
                 }

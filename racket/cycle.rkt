@@ -1,7 +1,7 @@
 #lang racket
-(require rosetta/autocad)
+(require rosetta/glfast)
 
-;(init 1000)
+(init 1000)
 
 ;(city 200)
 #;
@@ -29,10 +29,10 @@
 
 (define truss-radius-bar (make-parameter 0.01))
 
-(define (barra-trelica p0 p1)
-  (when (not (=c? p0 p1))
-    ; (empty-shape)
-    (cylinder p0 (truss-radius-bar) p1)))
+(define (barra-trelica p0 p1) #f
+  #;(when (not (=c? p0 p1))
+      ; (empty-shape)
+      (cylinder p0 (truss-radius-bar) p1)))
 
 (define (nos-trelica ps)
   (map no-trelica ps))
@@ -158,9 +158,9 @@
 ;(setup truss (list 20 10 10))
 
 #;#;(time
- (begin
-   (send_data)
-   (thread while)))
+   (begin
+     (send_data)
+     (thread while)))
 
 
 
@@ -171,30 +171,36 @@
        [x (in-range 5 30 2)]
        [y (in-range 5 20 1)])
     (begin (sleep 0.1)
-    (update (list 30 x y)))
+           (update (list 30 x y)))
     ))
 
 
-#;(animate)
+;(animate)
 #;(sliders
- "Truss"
- (lambda (n sizex sizey angle cam-z)
-   (begin
-     ;(view (cyl 100.0 (/ angle 10) cam-z) (u0))
-     (update (list n sizex sizey))))
- '(("n" 5 50 20)
-   ("sizex" 1 20 10)
-   ("sizey" 1 20 10)
-   ("angle" -70 70 0)
-   ("cam-z" -100 100 0)))
+   "Truss"
+   (lambda (n sizex sizey angle cam-z)
+     (begin
+       ;(view (cyl 100.0 (/ angle 10) cam-z) (u0))
+       (update (list n sizex sizey))))
+   '(("n" 5 50 20)
+     ("sizex" 1 20 10)
+     ("sizey" 1 20 10)
+     ("angle" -70 70 0)
+     ("cam-z" -100 100 0)))
 ;(pyramid (xyz 0.0 0.0 0.0) 10.0 10.0 (xyz 0.0 0.0 5.0) 1.0 0.0 1.0)
 
 
-(truss 5 10 10)
+(truss 40 30 30)
+;(close)
+(start)
 
+#;(time
+   (begin
+     (send_data)
+     (thread while)))
 ;(cylinder 0.0 0.0 0.0 10.0 5.4 0.0 0.0 0.0 29.0 0.0 1.0 0.0)
 ;(cylinder-p (xyz 0.0 0.0 0.0) 2.0 (xyz 10.0 5.4 0.0))
-;(read)
+(read)
 (displayln "END")
 
 

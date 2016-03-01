@@ -16,12 +16,13 @@
 
 
 void testError(std::string src) {
-	//GLenum err = glGetError();
-	//if (err != GL_NO_ERROR)
-	//{
-	//printf("(%s) Error: %s\n", src.c_str(), gluErrorString(err));
-	printf("testError: Nao sei!\n");
-	//}
+	GLenum err = glGetError();
+	if (err != GL_NO_ERROR)
+	{
+	printf("(%s) Error: %s %d\n", src.c_str(), gluErrorString(err), err);
+	fflush(stdout);
+	//printf("testError: Nao sei!\n");
+	}
 }
 
 // Shader creation helper
@@ -48,6 +49,7 @@ GLuint createShader(GLenum type, const GLchar* src) {
 		glDeleteShader(shader);
 		return 1;
 	}
+
 
 	return shader;
 }

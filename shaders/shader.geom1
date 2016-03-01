@@ -1,7 +1,7 @@
 // Geometry shader
 const GLchar* geometryShaderSrc1 = GLSL(
     layout(points) in;
-    layout(line_strip, max_vertices = 255) out;
+    layout(line_strip, max_vertices = 128) out;
 
     //uniform mat4 view;
     //uniform mat4 projection;
