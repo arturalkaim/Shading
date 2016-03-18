@@ -216,6 +216,7 @@
                                        (xyz i j 0))
                                      (- n) n s
                                      (- n) n (/ s 2)))
+         (delete-all-shapes)
          ))
 
 
@@ -252,7 +253,7 @@
         (writeln (format "~a ~a" s d) out)
         (writeln real out)))))
 (current-date)
-;(test)
+(test)
 (current-date)
 #;(let ([id (thread run10)])
     (sleep 2)

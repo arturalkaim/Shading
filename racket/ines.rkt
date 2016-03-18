@@ -1,11 +1,11 @@
 #lang racket
-(require rosetta/autocad
+(require rosetta/glfast
          )
 
 
 ;(p3d:dir-dy rot-dir) (p3d:dir-dz rot-dir)
 
-
+(init 100)
 
 (define (vector-normalizado v)
   (let ((l (sqrt (+ (sqr (cx v))
@@ -86,13 +86,15 @@
 
 #;
 (setup brick-wall (list -21 21 0 10 25 12))
+
 (brick-wall -21 21 0 10 25 12)
-#;(define (run)
+
+(define (run)
   (pool)
   (cycle)
   (run))
 
-#;(time
+(time
  (begin
    (send_data)
    (thread run)))

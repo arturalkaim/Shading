@@ -1,84 +1,7 @@
 #lang racket
-(require ffi/unsafe
-         ffi/unsafe/define
-         math/flonum
-         "sliders.rkt"
-         (except-in  "base.rkt" sphere cylinder box)
-         (prefix-in p3d: pict3d)
-         racket/trace
-         )
+(require rosetta/glfast)
 
-(define-ffi-definer define-test (ffi-lib "/Users/arturalkaim/Shaders/lib/libSOGL"))
-
-(define-test start (_fun -> _int))
-;(define-test createPoints (_fun _int -> _int))
-(define-test box (_fun _float _float _float _float _float _float _float _float _float -> _int))
-(define-test cylinder (_fun _float _float _float _float _float _float _float _float _float _float _float _float -> _int))
-(define-test sphere (_fun _float _float _float _float _float _float _float -> _int))
-;(define-test pyramid (_fun _float _float _float _float _float _float _float -> _int))
-;(define-test rotate (_fun _int _float _float _float _float -> _int))
-;(define-test move (_fun _int _float _float _float -> _int))
-;(define-test scale (_fun _int _float _float _float -> _int))
-(define-test init (_fun _int -> _int))
-(define-test cycle (_fun -> _void))
-(define-test pool (_fun -> _void))
-(define-test main (_fun -> _int))
-(define-test end_cycle (_fun -> _int))
-(define-test send_data (_fun -> _int))
-;(define-test city (_fun _int -> _void))
-
-
-(define (end_cycle?)
-  (if (< (end_cycle) 0)
-      #f
-      #t))
-
-(define (box-p p l w h)
-  (box (cx p) (cy p) (cz p) l w h))
-(define (cube-p p l)
-  (box (cx p) (cy p) (cz p) l l 0.0 1.0 0.0 0.0))
-(define (sphere-p p r)
-  (sphere (cx p) (cy p) (cz p) r 0.0 0.0 0.0))
-(define (cylinder-z p l h ang vx vy vz)
-  (cylinder (p3d:pos-x p) (p3d:pos-y p) (p3d:pos-z p) l h 0.0 0.0 0.0 ang vx vy vz ))
-
-(define (cylinder-p p0 h p1)
-  (if (not (xyz? p1))
-      (cylinder-z p0 h (/ p1 2 ))
-      (let* ((vec-dir (p3d:pos- (xyz->pos p1) (xyz->pos p0)))
-             (rot-dir (p3d:dir-normalize (p3d:dir-cross vec-dir p3d:+z)))
-             (dir (p3d:dir h h (/ (p3d:dir-dist vec-dir) 2)))
-             (center (p3d:pos-between (xyz->pos p0) (xyz->pos p1) 1/2))
-             (angle (acos (/ (p3d:dir-dot vec-dir p3d:+z) (* (p3d:dir-dist vec-dir) (p3d:dir-dist p3d:+z))))))
-        (match-let-values
-         ([(yaw pit) (p3d:dir->angles (p3d:pos- (xyz->pos p1) (xyz->pos p0)))])
-         (cylinder-z center (p3d:dir-dx dir) (p3d:dir-dist vec-dir) (- angle) (p3d:dir-dx rot-dir) (p3d:dir-dy rot-dir) (p3d:dir-dz rot-dir))
-         ))
-      )
-  )
-
-#;
-(define (building x y z w l h)
-  (let ([h1 (* 0.7 h)]
-        [h2 (* 0.4 h)])
-    (begin
-      (box x y h1 w l h1)
-      (cylinder x y (+ (* h1 2) h2) (* 0.7 w) h2 0.0 0.0 0.0)
-      )
-    )
-  )
-
-
-;(init 1000)
-
-#;
-(let ([grid-size 30.0])
-  (for* ([xi  (in-range (- grid-size) grid-size 0.3)]
-         [yi  (in-range (- grid-size) grid-size 0.3)])
-    (building xi yi 0.0 0.1 0.1 (random))))
-
-
-;(scale (rotate (move (cylinder-p (xyz 0.0 0.0 0.0) 0.3 (xyz 1.0 1.0 1.0)) 0.0 1.0 0.0) 10.0 1.0 0.0 0.0) 1.0 3.0 1.0)
+(init 1000)
 
 ;(city 200)
 #;
@@ -99,17 +22,17 @@
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 
-(define truss-node-radius (make-parameter 0.05))
+(define truss-node-radius (make-parameter 0.08))
 
 (define (no-trelica p)
-  (sphere-p p (truss-node-radius)))
+  (sphere2 p (truss-node-radius)))
 
 (define truss-radius-bar (make-parameter 0.01))
 
-(define (barra-trelica p0 p1)
-  (when (not (=c? p0 p1))
+(define (barra-trelica p0 p1) #f
+  #;(when (not (=c? p0 p1))
     ; (empty-shape)
-    (cylinder-p p0 (truss-radius-bar) p1)))
+    (cylinder p0 (truss-radius-bar) p1)))
 
 (define (nos-trelica ps)
   (map no-trelica ps))
@@ -215,57 +138,69 @@
        (insert-pyramid-vertex
         matrix)))))
 
-(define (sin-u*v n)
+(define (sin-u*v n sizex sizey)
   (map-division
    (lambda (u v)
-     (xyz (* u 10)
-          (* v 10)
+     (xyz (* u sizex)
+          (* v sizey)
           (* 4 (sin (* u v)))))
    (* -1 pi) (* 1 pi) n
    (* -1 pi) (* 1 pi) n))
 
-(define size 10)
+
 
 (displayln "START")
 
-
-
-(define (while)
-  (send_data)
-  (unless (end_cycle?)
-    (begin
-      (pool)
-      (cycle)
-      (while))))
-
+(define (truss n sizex sizey)
+  
+  (render-truss (sin-u*v  n sizex sizey)))
 ;(trace while cycle pool)
-;(define size 15)
-(init 10000)
+;(setup truss (list 20 10 10))
 
-(define (render size)
-  (begin (displayln "GOING")
-    (render-truss (sin-u*v size))  
-         (start)))
+#;#;(time
+ (begin
+   (send_data)
+   (thread while)))
 
-(sliders
- "Foo2"
- (lambda (size) (render size))
- '(("size" 5 20)))
 
-;(begin (init 10000)
-;(render-truss (sin-u*v size)))
 
-;(time 
-;  (start))
+(define (animate)
+  (for
+      (
+       ;[n (in-range 5 70 5)]
+       [x (in-range 5 30 2)]
+       [y (in-range 5 20 1)])
+    (begin (sleep 0.1)
+    (update (list 30 x y)))
+    ))
 
+
+#;(animate)
+#;(sliders
+ "Truss"
+ (lambda (n sizex sizey angle cam-z)
+   (begin
+     ;(view (cyl 100.0 (/ angle 10) cam-z) (u0))
+     (update (list n sizex sizey))))
+ '(("n" 5 50 20)
+   ("sizex" 1 20 10)
+   ("sizey" 1 20 10)
+   ("angle" -70 70 0)
+   ("cam-z" -100 100 0)))
+;(pyramid (xyz 0.0 0.0 0.0) 10.0 10.0 (xyz 0.0 0.0 5.0) 1.0 0.0 1.0)
+
+
+(truss 15 10 10)
+;(cycle)
+(start)
+
+#;(time
+ (begin
+   (send_data)
+   (thread while)))
 ;(cylinder 0.0 0.0 0.0 10.0 5.4 0.0 0.0 0.0 29.0 0.0 1.0 0.0)
 ;(cylinder-p (xyz 0.0 0.0 0.0) 2.0 (xyz 10.0 5.4 0.0))
-;(send_data)
-;(while)
-
-
-;(main)
-;(displayln (start))
+(read)
 (displayln "END")
 
 

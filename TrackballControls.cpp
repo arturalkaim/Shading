@@ -26,7 +26,7 @@ namespace sasmaster{
 
 
 	Camera3D::Camera3D(const glm::vec3& pos)
-		:m_eye(pos),m_up(0.0f,1.0f,0.0f),m_viewMatr(1.0f)
+		:m_eye(pos),m_up(0.0f,-1.0f,0.0f),m_viewMatr(1.0f)
 	{
 
 

@@ -1,11 +1,5 @@
 #lang racket
-(require ffi/unsafe
-         ffi/unsafe/define
-         math/flonum
-         math/matrix
-         "sliders.rkt"
-         "base.rkt"
-         (prefix-in p3d: pict3d)
+(require rosetta/glfast
          )
 
 (init 10)
@@ -30,12 +24,12 @@
          [p1 (+z p0 15.0)])
     (trunk p0 5.0 5.0 17.0 17.0 p1 5.0))
 
-(let* ([p0 (xyz 0.0 5.0 10.0)]
-       [p1 (+yz p0 0.0 1.0)]
+(let* ([p0 (xyz 0.0 5.0 0.0)]
+       [p1 (+yz p0 0.0 20.0)]
        [a1 (/ pi 2)]
        [a2 (* (/ pi 6) 7)]
        [a3 (- (/ pi 3))])
-  (irregularPyramid3 p0 p1 15.0 a1 17.0 a2 17.0 a3 0.0 0.7 0.0))
+  (irregularPyramid3 p0 p1 35.0 a1 37.0 a2 37.0 a3 0.0 0.7 0.0))
 
 (point (u0) 1.0 0.0 0.0)
 

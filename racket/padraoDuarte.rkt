@@ -2,7 +2,7 @@
 (require rosetta/glfast)
 
 
-;(init 100)
+(init 100)
 
 (define (itera-pts f ptss)
   (for/list ((pts0 ptss))
@@ -246,6 +246,7 @@
   (begin
     (send_data)
     (do-cycles 10)
+    (start)
     (end_cycle?)))
 
 (current-directory)
@@ -261,7 +262,7 @@
         (writeln (format "~a ~a" s d) out)
         (writeln real out)))))
 
-(test)
+;(test)
 
-;(run 10 10)
-;(read)
+(run 10 10)
+(read)

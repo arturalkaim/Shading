@@ -138,12 +138,12 @@
        (insert-pyramid-vertex
         matrix)))))
 
-(define (sin-u*v n sizex sizey)
+(define (sin-u*v t n sizex sizey)
   (map-division
    (lambda (u v)
      (xyz (* u sizex)
           (* v sizey)
-          (* 4 (sin (* u v)))))
+          (* (sin (+ t (* u v))))))
    (* -1 pi) (* 1 pi) n
    (* -1 pi) (* 1 pi) n))
 
@@ -151,31 +151,34 @@
 
 (displayln "START")
 
-(define (truss n sizex sizey)
-  
-  (render-truss (sin-u*v  n sizex sizey)))
+(define (truss n sizex sizey [t 0])
+  (begin
+    ;(render-truss (sin-u*v (* t 2)  n (* sizex 2) (* sizey 2)))
+    (render-truss (sin-u*v t  n sizex sizey))))
+
 ;(trace while cycle pool)
-;(setup truss (list 20 10 10))
+(setup truss (list 20 40 40 10))
 
-#;#;(time
+#;(time
    (begin
-     (send_data)
-     (thread while)))
+     (truss 200 50 50 10)
+     #f
+     ))
 
+;(truss 250 50 50 10)
+
+;(truss 30 10 10 30)
 
 
 (define (animate)
-  (for
-      (
-       ;[n (in-range 5 70 5)]
-       [x (in-range 5 30 2)]
-       [y (in-range 5 20 1)])
-    (begin (sleep 0.1)
-           (update (list 30 x y)))
-    ))
+  (for ([n (in-naturals)])
+    ;[x (in-range 5 30 2)]
+    ;[y (in-range 5 20 1)])
+    (begin (displayln n)
+           (update (list 10 20 20 (modulo n 6))))))
 
 
-;(animate)
+
 #;(sliders
    "Truss"
    (lambda (n sizex sizey angle cam-z)
@@ -190,22 +193,64 @@
 ;(pyramid (xyz 0.0 0.0 0.0) 10.0 10.0 (xyz 0.0 0.0 5.0) 1.0 0.0 1.0)
 
 
-(truss 40 30 30)
+(truss 40 30 30 10)
 ;(close)
 (start)
 
 #;(time
-   (begin
-     (send_data)
-     (thread while)))
+ (begin
+   (send_data)
+   (thread while)))
+
+;(animate)
 ;(cylinder 0.0 0.0 0.0 10.0 5.4 0.0 0.0 0.0 29.0 0.0 1.0 0.0)
 ;(cylinder-p (xyz 0.0 0.0 0.0) 2.0 (xyz 10.0 5.4 0.0))
-(read)
+;(read)
+(current-directory)
+
+#;(define (test)
+    (define out (open-output-file "times-Rhino-truss.tms" #:mode 'text #:exists 'append))
+    (let ([sizes (list 150 25 50 100 200 250 300)])
+      (for ((s sizes))
+        (delete-all-shapes)
+        (define input (list s 40 40 20))
+        (define-values (res cpu real gc)(time-apply truss input))
+        (delete-all-shapes)
+        (displayln "GONE")
+        (display "Size: " out)(displayln s out)
+        (displayln real out))))
+
+
+#;(define (test2)
+    (define out (open-output-file "times-SimpleGL-truss.tms" #:mode 'text #:exists 'append))
+    (let ([sizes (list 150 25 50 100 200 250 300)])
+      (for ((s sizes))
+        (init2 100)
+        (define input (list s 40 40 0))
+        (define-values (res cpu real gc)(time-apply truss input))
+        (define-values (res2 cpu2 real2 gc2)(time-apply cycle2 (list)))
+        (displayln "GONE")
+        (display "Size: " out)(displayln s out)
+        (displayln (+ real (car res2) real2) out)
+        (end_cycle2))))
+
+#;(define (test)
+    (define out (open-output-file "times-FastGL-truss.tms" #:mode 'text #:exists 'append))
+    (let ([sizes (list 150 25 50 100 200 250 300)])
+      (for ((s sizes))
+        (init 100)
+        (define input (list s 40 40 0))
+        (define-values (res cpu real gc)(time-apply truss input))
+        (define-values (res2 cpu2 real2 gc2)(time-apply send_data (list)))
+        (define-values (res3 cpu3 real3 gc3)(time-apply cycle (list)))
+        (displayln "GONE")
+        (display "Size: " out)(displayln s out)
+        (displayln (+ real (car res3) real3 real2) out)
+        (end_cycle))))
+
+;(truss 250 50 50 10)
+;(test)
 (displayln "END")
-
-
-
-
 ;loop 0 to N{
 ;modelo(n)
 ;delete shapes

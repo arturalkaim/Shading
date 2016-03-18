@@ -1,7 +1,7 @@
 // Geometry shader
 const GLchar* geometryShaderSrc = GLSL(
     layout(points) in;
-    layout(triangle_strip, max_vertices = 138) out;
+    layout(triangle_strip, max_vertices = 128) out;
 
     uniform vec3 cameraPos;
     uniform vec3 lookat;
@@ -28,7 +28,7 @@ const GLchar* geometryShaderSrc = GLSL(
     int calcSides(int sides){
         float dist = distance(aux,vec4(cameraPos,1.0));
         if(dist > vScale[0]*2){
-             return  int(min(sides,max(14.0,(vScale[0]/dist)*(vSides[0]*30.0))));
+             return  int(min(sides,max(4.0,(vScale[0]/dist)*(vSides[0]*30.0))));
         }
         return sides;
     }
@@ -58,6 +58,26 @@ const GLchar* geometryShaderSrc = GLSL(
 			EmitVertex();
 		}
 		EndPrimitive();			
+	}
+	
+	//ERROR: PROBABLY CODE JUNK
+	void makeExtrusion(int n,float h){
+		vec4 normal = vec4(cross(vec3(tMat[0][0],tMat[0][1],tMat[0][2])-vec3(tMat[1][0],tMat[1][1],tMat[1][2]),
+								 vec3(tMat[1][0],tMat[1][1],tMat[1][2])-vec3(tMat[2][0],tMat[2][1],tMat[2][2]))*h,1.0);
+		for(int i = 1;i<n && i<4;i++){
+			gl_Position = MVP * vec4(tMat[0][0],tMat[0][1],tMat[0][2],1.0);
+			EmitVertex();
+			gl_Position = MVP * vec4(tMat[i][0],tMat[i][1],tMat[i][2],1.0);
+			EmitVertex();
+		}
+		EndPrimitive();
+		for(int i = 1;i<n && i<4;i++){
+			gl_Position = MVP * vec4(tMat[0][0],tMat[0][1],tMat[0][2],1.0) +  MVP * normal;
+			EmitVertex();
+			gl_Position = MVP * vec4(tMat[i][0],tMat[i][1],tMat[i][2],1.0)  +  MVP * normal;
+			EmitVertex();
+		}
+		EndPrimitive();
 	}
 	void irregularPyramid3(){
 		vec4 p0 = vec4(tMat[0][0],tMat[0][1],tMat[0][2],1.0);
@@ -631,7 +651,10 @@ const GLchar* geometryShaderSrc = GLSL(
 
 			case 14:
 				makeTriangle();
-            
+				 break;
+			case 15:
+				makeExtrusion(int(vSides[0]),vScale[0]);
+				break;
 			default:
                  break;
         }

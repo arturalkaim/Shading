@@ -216,7 +216,8 @@
                                               (xyz i j 0))
                                             (- n) n s
                                             (- n) n (/ s 2)))
-         (delete-all-shapes)))
+         (delete-all-shapes)
+         ))
 
 
 
@@ -239,7 +240,7 @@
 ;10 14 740052 (30729 minimizado)
 ;20 20 cpu time: 22141 real time: 1045044 gc time: 544
 (define (run10) (run 10 10))
-;(run 10 14)
+(run 20 8)
 
 (define out (open-output-file (format "r-times-~a-~a.tms" "rhino" "padrao") #:mode 'text #:exists 'append))
 (define (test)

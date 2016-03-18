@@ -100,7 +100,7 @@ namespace F0 {
 		if (n_points >= vecSize) {
 			points = (float *)realloc(points, sizeof(float)*VALUES_PER_POINT*vecSize * 2);
 			vecSize = 2 * vecSize;
-			printf("TEST %d  :  %d\n", vecSize, n_points);
+			//printf("TEST %d  :  %d\n", vecSize, n_points);
 		}
 
 		//printMatrix(mat);
@@ -199,8 +199,8 @@ namespace F0 {
 		n = glm::vec3(pos_x_2, pos_y_2, pos_z_2) - glm::vec3(pos_x, pos_y, pos_z);
 		o = glm::vec3(pos_x + pos_x_2, pos_y + pos_y_2, pos_z + pos_z_2) / 2.0f;
 		//glm::vec3(pos_x, pos_y, pos_z); //
-		printf("Vecs o:\n");
-		printVec(o);
+		/*printf("Vecs o:\n");
+		printVec(o);*/
 		vx = vpol(1.0f, glm::atan(n.y, n.x) + (PI / 2.0f));
 		//if (vx.x < 0 || vx.y < 0 || vx.z < 0)
 		//	vx = -vx;
@@ -216,12 +216,12 @@ namespace F0 {
 				(let ((vz (unitize n)))
 				  (cs-from-o-vx-vy-vz o vx vy vz))))))
 				  */
-		printf("Vecs x:\n");
+		/*printf("Vecs x:\n");
 		printVec(vx);
 		printf("Vecs y:\n");
 		printVec(vy);
 		printf("Vecs z:\n");
-		printVec(vz);
+		printVec(vz);*/
 
 		return matFromVecs(o, vx, vy, vz);
 	}
@@ -321,6 +321,8 @@ namespace F0 {
 		for (int i = 0; i < n; i++) {
 			ret[i][0] = pts[j++]; ret[i][1] = pts[j++]; ret[i][2] = pts[j++];
 		}
+		//printMatrix(ret);
+
 		return ret;
 	}
 
@@ -517,14 +519,20 @@ namespace F0 {
 	}
 
 	extern "C" __declspec(dllexport) int line(int n, float *pts, float r, float g, float b) {
-		printf("List n: %d\n", n);
+		//printf("List n: %d\n", n);
 		return buildPoint(n_points, buildTMatrixFromPointsList(n, pts), 13, n, scaleFromPointsList(pts), glm::vec3(r, g, b));
+	}
+	extern "C" __declspec(dllexport) int extrusion(int n, float *pts, float h, float r, float g, float b) {
+		// printf("List n: %d\n", n);
+		return buildPoint(n_points, buildTMatrixFromPointsList(n, pts), 15, n, h, glm::vec3(r, g, b));
 	}
 
 
 	extern "C" __declspec(dllexport) int triangle(float *pts, float r, float g, float b) {
-
-		return 	buildPoint(n_points, buildTMatrixFromPointsList(3, pts), 14, 3, scaleFromPointsList(pts), glm::vec3(r, g, b));
+		//printf("triangle n: %d\n", n_points);
+		int  ret = buildPoint(n_points, buildTMatrixFromPointsList(3, pts), 14, 3, scaleFromPointsList(pts), glm::vec3(r, g, b));
+		//printMatrixV(n_points-1);
+		return ret;
 	}
 
 	void triangulate(int n, float *pts, float r, float g, float b) {
@@ -890,9 +898,9 @@ namespace F0 {
 
 		glLinkProgram(shaderProgram);
 		testError("TEST glLinkProgram");
-		//glLinkProgram(shaderProgram1);
+		glLinkProgram(shaderProgram1);
 		testError("TEST glLinkProgram1");
-		//glLinkProgram(shaderProgram2);
+		glLinkProgram(shaderProgram2);
 		GLint isLinked = 0;
 		glGetProgramiv(shaderProgram, GL_LINK_STATUS, (int *)&isLinked);
 		if (isLinked == GL_FALSE)
@@ -900,7 +908,7 @@ namespace F0 {
 			GLint maxLength = 0;
 			char * infoLog;
 			glGetProgramiv(shaderProgram, GL_INFO_LOG_LENGTH, &maxLength);
-			infoLog = (char*) malloc(maxLength);
+			infoLog = (char*)malloc(maxLength);
 
 			glGetProgramInfoLog(shaderProgram, maxLength, &maxLength, infoLog);
 			printf("Program Not Linked %d:\n %s\n", maxLength, infoLog);
@@ -937,7 +945,7 @@ namespace F0 {
 		glEnableVertexAttribArray(posAttrib);
 		testError("GOGO 333");
 		glVertexAttribPointer(posAttrib, 4, GL_FLOAT, GL_FALSE, VALUES_PER_POINT * sizeof(GLfloat), 0);
-		
+
 		// Specify layout of point data
 		posAttrib = glGetAttribLocation(shaderProgram, "mat_2");
 		glEnableVertexAttribArray(posAttrib);
@@ -972,7 +980,7 @@ namespace F0 {
 		posAttrib = glGetAttribLocation(shaderProgram, "ratio");
 		glEnableVertexAttribArray(posAttrib);
 		glVertexAttribPointer(posAttrib, 1, GL_FLOAT, GL_FALSE, VALUES_PER_POINT * sizeof(GLfloat), (void*)(19 * sizeof(GLfloat)));
-		
+
 		//init camera object:
 		tCam = new Camera3D(cameraPos);
 		//Init trackball instance :
@@ -1026,10 +1034,10 @@ namespace F0 {
 	}
 
 	extern "C" __declspec(dllexport) int send_data() {
-		testError("TEST send_data1");
+		//testError("TEST send_data1");
 		glBindBuffer(GL_ARRAY_BUFFER, vbo);
 		glBufferData(GL_ARRAY_BUFFER, sizeof(float)*VALUES_PER_POINT*n_points, points, GL_STATIC_DRAW);
-		testError("TEST send_data2");
+		//testError("TEST send_data2");
 		return n_points;
 	}
 
@@ -1081,7 +1089,7 @@ namespace F0 {
 		// do_movement();
 	}
 
-	extern "C" __declspec(dllexport) void cycle() {
+	extern "C" __declspec(dllexport) float cycle() {
 
 		int width, height;
 		glfwGetFramebufferSize(window, &width, &height);
@@ -1108,6 +1116,19 @@ namespace F0 {
 
 		// Pass them to the shaders
 		glm::mat4 mvp = projection * view * model;
+
+
+		GLuint64 startTime, stopTime;
+		GLuint queryID[2];
+
+		// generate two queries
+		glGenQueries(2, queryID);
+
+		// issue the first query
+		// Records the time only after all previous 
+		// commands have been completed
+		glQueryCounter(queryID[0], GL_TIMESTAMP);
+
 
 		switch (tball->shaderid)
 		{
@@ -1154,8 +1175,26 @@ namespace F0 {
 
 		glfwSwapBuffers(window);
 
+
+		glQueryCounter(queryID[1], GL_TIMESTAMP);
+
+		// wait until the results are available
+		GLint stopTimerAvailable = 0;
+		while (!stopTimerAvailable) {
+			glGetQueryObjectiv(queryID[1],
+				GL_QUERY_RESULT_AVAILABLE, &stopTimerAvailable);
+		}
+
+		// get query results
+		glGetQueryObjectui64v(queryID[0], GL_QUERY_RESULT, &startTime);
+		glGetQueryObjectui64v(queryID[1], GL_QUERY_RESULT, &stopTime);
+
+		float gpuTime = (stopTime - startTime) / 1000000.0;
+		printf("Time spent on the GPU: %f ms\n", gpuTime);
+
 		calcFPS(window);
 
+		return gpuTime;
 	}
 
 #define PI          3.14159265358979
@@ -1295,6 +1334,7 @@ namespace F0 {
 	}
 
 	extern "C" __declspec(dllexport) int start() {
+		printf("TEST START");
 		send_data();
 		while (end_cycle() < 0) {
 			pool();
