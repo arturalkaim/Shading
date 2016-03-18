@@ -74,12 +74,13 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
+    <TargetName>shading</TargetName>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <LinkIncremental>false</LinkIncremental>
+    <LinkIncremental>true</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -110,7 +111,7 @@
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <AdditionalLibraryDirectories>C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glew-1.13.0\lib\Release\x64;C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glew-1.13.0\bin\Release\x64;C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glfw-3.1.2.bin.WIN64\lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalDependencies>opengl32.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;GLU32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -139,12 +140,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <PreprocessorDefinitions>NDEBUG;_WINDOWS;_USRDLL;SHADING_EXPORTS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glew-1.13.0\include;C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glm-0.9.7.1\glm;C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glfw-3.1.2.bin.WIN64\include;C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\shading;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Windows</SubSystem>
+      <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
+      <AdditionalLibraryDirectories>C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glew-1.13.0\lib\Release\x64;C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glew-1.13.0\bin\Release\x64;C:\Users\DEMO\Documents\Visual Studio 2015\Projects\shading\glfw-3.1.2.bin.WIN64\lib-vc2015;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>opengl32.lib;glfw3.lib;GLU32.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -152,13 +156,29 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\glew-1.13.0\include\GL\glew.h" />
+    <ClInclude Include="common\shapes.h" />
+    <ClInclude Include="common\utils.h" />
     <ClInclude Include="main.h" />
+    <ClInclude Include="poly2tri.h" />
     <ClInclude Include="shaders.h" />
+    <ClInclude Include="shading.h" />
     <ClInclude Include="stdafx.h" />
+    <ClInclude Include="sweep\advancing_front.h" />
+    <ClInclude Include="sweep\cdt.h" />
+    <ClInclude Include="sweep\sweep.h" />
+    <ClInclude Include="sweep\sweep_context.h" />
+    <ClInclude Include="TrackballControls.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\glew-1.13.0\src\glew.c" />
+    <ClCompile Include="common\shapes.cc" />
+    <ClCompile Include="Libs\glew-1.13.0\src\glew.c" />
+    <ClCompile Include="SGLMain.cpp" />
     <ClCompile Include="shading.cpp" />
+    <ClCompile Include="sweep\advancing_front.cc" />
+    <ClCompile Include="sweep\cdt.cc" />
+    <ClCompile Include="sweep\sweep.cc" />
+    <ClCompile Include="sweep\sweep_context.cc" />
+    <ClCompile Include="TrackballControls.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="shaders\shader.frag" />
