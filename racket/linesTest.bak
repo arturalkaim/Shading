@@ -1,9 +1,0 @@
-#lang racket
-(require ffi/unsafe
-         ffi/unsafe/define
-         math/flonum
-         math/matrix
-         "sliders.rkt"
-         "base.rkt"
-         (prefix-in p3d: pict3d)
-         )
